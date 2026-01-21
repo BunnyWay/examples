@@ -41,7 +41,7 @@ jobs:
 
           echo "Changed apps: $CHANGED_DIRS"
 
-  build:
+  build-and-deploy:
     needs: detect-changes
     if: needs.detect-changes.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
@@ -62,19 +62,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=
-
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.app }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}:latest
+
+      - name: Get App ID for this app
+        id: app-config
+        run: |
+          # Convert app-express to APP_EXPRESS_ID
+          VAR_NAME=$(echo "${{ matrix.app }}" | tr '[:lower:]-' '[:upper:]_')_ID
+          echo "app_id_var=$VAR_NAME" >> $GITHUB_OUTPUT
+
+      - name: Update container image on Magic Containers
+        uses: BunnyWay/actions/container-update-image@main
+        with:
+          app_id: ${{ vars[steps.app-config.outputs.app_id_var] }}
+          api_key: ${{ secrets.BUNNYNET_API_KEY }}
+          container: app
+          image_tag: ${{ github.sha }}
