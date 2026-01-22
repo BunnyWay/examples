@@ -68,8 +68,8 @@ jobs:
           context: ./${{ matrix.app }}
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}:${{ github.sha }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.app }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/examples-${{ matrix.app }}:${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/examples-${{ matrix.app }}:latest
 
       - name: Get App ID for this app
         id: app-config
