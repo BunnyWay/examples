@@ -13,6 +13,8 @@ Each app embeds [Bunny Player](https://docs.bunny.net/stream/player) and control
 | [`player-vue`](player-vue) | Vue 3 with Vite |
 | [`player-nuxt`](player-nuxt) | Nuxt 4 |
 | [`player-sveltekit`](player-sveltekit) | SvelteKit with Svelte 5 |
+| [`player-astro`](player-astro) | Astro |
+| [`player-vanilla`](player-vanilla) | Vanilla TypeScript with Vite |
 
 The player apps play a demo video straight after cloning:
 
