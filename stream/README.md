@@ -33,4 +33,7 @@ The browser uploads video straight to Bunny Stream over [TUS](https://docs.bunny
 | [`upload-tus-nextjs`](upload-tus-nextjs) | Next.js with tus-js-client |
 | [`upload-tus-nuxt`](upload-tus-nuxt) | Nuxt 4 with tus-js-client |
 | [`upload-tus-sveltekit`](upload-tus-sveltekit) | SvelteKit with tus-js-client |
+| [`upload-tus-laravel`](upload-tus-laravel) | Laravel with tus-js-client |
+| [`upload-tus-rails`](upload-tus-rails) | Rails with tus-js-client |
+| [`upload-tus-django`](upload-tus-django) | Django with tus-js-client |
 | [`upload-uppy-react`](upload-uppy-react) | Uppy Dashboard with React and Bun |
