@@ -37,3 +37,13 @@ The browser uploads video straight to Bunny Stream over [TUS](https://docs.bunny
 | [`upload-tus-rails`](upload-tus-rails) | Rails with tus-js-client |
 | [`upload-tus-django`](upload-tus-django) | Django with tus-js-client |
 | [`upload-uppy-react`](upload-uppy-react) | Uppy Dashboard with React and Bun |
+
+## Token authentication
+
+With [token authentication](https://docs.bunny.net/stream/token-authentication) turned on, the player only loads embed URLs signed with your library's token authentication key. These apps sign the URL on the server, so the key never reaches the browser. They need a library ID, video ID, and key in `.env`.
+
+| Example | Stack |
+| --- | --- |
+| [`player-token-auth-nextjs`](player-token-auth-nextjs) | Next.js App Router |
+| [`player-token-auth-nuxt`](player-token-auth-nuxt) | Nuxt 4 |
+| [`player-token-auth-sveltekit`](player-token-auth-sveltekit) | SvelteKit with Svelte 5 |
