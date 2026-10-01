@@ -1,0 +1,16 @@
+# Local env files
+/.env*
+!/.env.example
+
+# Logs and temp files
+/log/*
+/tmp/*
+
+# Rails secrets
+/config/master.key
+/config/credentials/*.key
+
+# Compiled assets
+/public/assets
+
+.DS_Store

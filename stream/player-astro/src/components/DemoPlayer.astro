@@ -1,0 +1,139 @@
+---
+import BunnyPlayer from "./BunnyPlayer.astro";
+
+type Props = {
+  libraryId: string;
+  videoId: string;
+};
+
+const { libraryId, videoId } = Astro.props;
+const rates = [1, 1.5, 2];
+---
+
+<BunnyPlayer libraryId={libraryId} videoId={videoId} params={{ preload: true }} />
+
+<progress max="1" value="0"></progress>
+
+<div class="controls">
+  <button type="button" data-action="toggle" disabled>Play</button>
+  <button type="button" data-action="restart" disabled>Restart</button>
+  <button type="button" data-action="mute" disabled>Mute</button>
+  {
+    rates.map((value) => (
+      <button type="button" data-rate={value} aria-pressed={value === 1} disabled>
+        {value}x
+      </button>
+    ))
+  }
+  <span class="time">0:00 / 0:00</span>
+</div>
+
+<ol class="log" aria-label="Player events">
+  <li>Waiting for the player…</li>
+</ol>
+
+<script>
+  import type { Player, TimeUpdate } from "player.js";
+
+  const element = document.querySelector("bunny-player")!;
+  const progress = document.querySelector("progress")!;
+  const time = document.querySelector(".time")!;
+  const log = document.querySelector(".log")!;
+  const buttons = document.querySelectorAll<HTMLButtonElement>(".controls button");
+  const toggle = document.querySelector<HTMLButtonElement>('[data-action="toggle"]')!;
+  const restart = document.querySelector<HTMLButtonElement>('[data-action="restart"]')!;
+  const mute = document.querySelector<HTMLButtonElement>('[data-action="mute"]')!;
+  const rateButtons = document.querySelectorAll<HTMLButtonElement>("[data-rate]");
+
+  let player: Player | null = null;
+  let playing = false;
+  const entries: string[] = [];
+
+  function formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const rest = Math.floor(seconds % 60);
+
+    return `${minutes}:${String(rest).padStart(2, "0")}`;
+  }
+
+  function record(event: string) {
+    entries.unshift(`${new Date().toLocaleTimeString()}  ${event}`);
+    entries.splice(5);
+    log.replaceChildren(
+      ...entries.map((entry) => {
+        const item = document.createElement("li");
+        item.textContent = entry;
+
+        return item;
+      }),
+    );
+  }
+
+  function setPlaying(value: boolean) {
+    playing = value;
+    toggle.textContent = playing ? "Pause" : "Play";
+  }
+
+  function setMuted(value: boolean) {
+    mute.textContent = value ? "Unmute" : "Mute";
+  }
+
+  function setRate(value: number) {
+    rateButtons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(Number(button.dataset.rate) === value));
+    });
+  }
+
+  element.addEventListener("ready", (event) => {
+    const instance = (event as CustomEvent<Player>).detail;
+    player = instance;
+    buttons.forEach((button) => (button.disabled = false));
+    // Library settings can autoplay or start muted, so read the real state.
+    instance.getPaused((paused) => setPlaying(!paused));
+    instance.getMuted(setMuted);
+    instance.on("playbackratechange", setRate);
+    record("ready");
+  });
+  element.addEventListener("play", () => {
+    setPlaying(true);
+    record("play");
+  });
+  element.addEventListener("pause", () => {
+    setPlaying(false);
+    record("pause");
+  });
+  element.addEventListener("ended", () => {
+    setPlaying(false);
+    record("ended");
+  });
+  element.addEventListener("timeupdate", (event) => {
+    const { seconds, duration } = (event as CustomEvent<TimeUpdate>).detail;
+    progress.max = duration || 1;
+    progress.value = seconds;
+    time.textContent = `${formatTime(seconds)} / ${formatTime(duration)}`;
+  });
+
+  toggle.addEventListener("click", () => (playing ? player?.pause() : player?.play()));
+  restart.addEventListener("click", () => player?.setCurrentTime(0));
+
+  mute.addEventListener("click", () => {
+    const instance = player;
+    if (!instance) return;
+
+    // Ask the player first, because viewers can also mute from its own controls.
+    instance.getMuted((isMuted) => {
+      if (isMuted) instance.unmute();
+      else instance.mute();
+      setMuted(!isMuted);
+    });
+  });
+
+  rateButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const value = Number(button.dataset.rate);
+      // npm player.js 0.1.0 has no setPlaybackRate(), so send the raw command.
+      player?.send({ method: "setPlaybackRate", value });
+      setRate(value);
+    });
+  });
+</script>
