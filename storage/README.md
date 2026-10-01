@@ -1,6 +1,6 @@
 # Bunny Storage examples
 
-These examples talk to [Bunny Storage](https://docs.bunny.net/storage) through its [S3-compatible API](https://docs.bunny.net/storage/s3), which is in public preview. Each one needs a storage zone created with S3 compatibility switched on, plus the zone name, password, and region in `.env`.
+These examples use the [S3-compatible API](https://docs.bunny.net/storage/s3) for [Bunny Storage](https://docs.bunny.net/storage). Each one needs a storage zone with S3 compatibility switched on, plus the zone name, password, and region in `.env`.
 
 | Example | What it shows |
 | --- | --- |

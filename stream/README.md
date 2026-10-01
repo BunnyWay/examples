@@ -1,10 +1,10 @@
 # Bunny Stream examples
 
-[Bunny Stream](https://docs.bunny.net/stream) hosts, encodes, and delivers your video. These examples cover the parts you build on your side: playing video and uploading it.
+Examples for playing and uploading video with [Bunny Stream](https://docs.bunny.net/stream).
 
 ## Bunny Player
 
-Each app embeds [Bunny Player](https://docs.bunny.net/stream/player) in an iframe and controls it with player.js. They share one demo page, so you can open two side by side and compare how each framework handles the same component.
+Each app embeds [Bunny Player](https://docs.bunny.net/stream/player) and controls it with player.js. They all build the same demo page, so you can compare frameworks side by side.
 
 | Example | Stack |
 | --- | --- |
@@ -14,7 +14,7 @@ Each app embeds [Bunny Player](https://docs.bunny.net/stream/player) in an ifram
 | [`player-nuxt`](player-nuxt) | Nuxt 4 |
 | [`player-sveltekit`](player-sveltekit) | SvelteKit with Svelte 5 |
 
-Every player app plays a demo video straight after cloning:
+The player apps play a demo video straight after cloning:
 
 ```bash
 cd stream/player-react
@@ -24,7 +24,7 @@ bun dev
 
 ## Uploads
 
-In these apps, the browser sends video straight to Bunny Stream over [TUS](https://docs.bunny.net/stream/tus-resumable-uploads), with a small server route that creates each video and signs the upload. They need a library ID and API key in `.env`.
+The browser uploads video straight to Bunny Stream over [TUS](https://docs.bunny.net/stream/tus-resumable-uploads), with a small server route that creates each video and signs the upload. These need a library ID and API key in `.env`.
 
 | Example | Stack |
 | --- | --- |
@@ -32,5 +32,3 @@ In these apps, the browser sends video straight to Bunny Stream over [TUS](https
 | [`upload-tus-nuxt`](upload-tus-nuxt) | Nuxt 4 with tus-js-client |
 | [`upload-tus-sveltekit`](upload-tus-sveltekit) | SvelteKit with tus-js-client |
 | [`upload-uppy-react`](upload-uppy-react) | Uppy Dashboard with React and Bun |
-
-The three tus-js-client apps can pause, resume, and pick an upload back up after a page reload.
