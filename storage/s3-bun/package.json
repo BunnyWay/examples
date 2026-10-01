@@ -1,0 +1,14 @@
+{
+  "name": "storage-s3-bun",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun roundtrip.ts",
+    "upload": "bun upload.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "~6.0.2"
+  }
+}
