@@ -70,6 +70,7 @@ export function BunnyPlayer({
         height: "auto",
         aspectRatio: "16 / 9",
         border: 0,
+        background: "#000",
       }}
       allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
       allowFullScreen

@@ -1,7 +1,19 @@
+/* bunny.net brand colours. light-dark() uses the first value in light mode. */
 :root {
   color-scheme: light dark;
+  --bunny-navy: #183d6d;
+  --bunny-ink: #03192e;
+  --bunny-sky: #e1f2ff;
+  --bunny-orange: #fd8d32;
+  --text: light-dark(var(--bunny-navy), var(--bunny-sky));
+  --surface: light-dark(#fff, var(--bunny-ink));
+  --tint: light-dark(#eaf6ff, #051e38);
+  --line: light-dark(#b5d7f7, #223c6a);
   font-family: system-ui, sans-serif;
   line-height: 1.5;
+  color: var(--text);
+  background: var(--surface);
+  accent-color: var(--bunny-orange);
 }
 
 body {
@@ -21,7 +33,7 @@ h1 {
 
 p {
   margin: 0 0 1.5rem;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 code {
@@ -30,8 +42,14 @@ code {
 
 .empty {
   padding: 1.5rem;
-  border: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+  border: 1px dashed var(--line);
   border-radius: 0.375rem;
+  background: var(--tint);
+}
+
+.error {
+  color: light-dark(#dc2626, #ff7754);
+  opacity: 1;
 }
 
 .player {
@@ -40,4 +58,9 @@ code {
   aspect-ratio: 16 / 9;
   border: 0;
   background: #000;
+}
+
+.expires {
+  margin: 1rem 0 0;
+  font-variant-numeric: tabular-nums;
 }
