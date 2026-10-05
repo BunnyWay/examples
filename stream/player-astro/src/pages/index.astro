@@ -1,0 +1,37 @@
+---
+import DemoPlayer from "../components/DemoPlayer.astro";
+import "../styles/global.css";
+
+const libraryId = import.meta.env.PUBLIC_BUNNY_LIBRARY_ID;
+const videoId = import.meta.env.PUBLIC_BUNNY_VIDEO_ID;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bunny Player with Astro</title>
+  </head>
+  <body>
+    <main>
+      <h1>Bunny Player with Astro</h1>
+      {
+        libraryId && videoId ? (
+          <>
+            <p>
+              The server renders the iframe, then a <code>&lt;bunny-player&gt;</code> custom element
+              attaches <code>player.js</code> in the browser.
+            </p>
+            <DemoPlayer libraryId={libraryId} videoId={videoId} />
+          </>
+        ) : (
+          <div class="empty">
+            Set <code>PUBLIC_BUNNY_LIBRARY_ID</code> and <code>PUBLIC_BUNNY_VIDEO_ID</code> in{" "}
+            <code>.env</code>, then restart the dev server.
+          </div>
+        )
+      }
+    </main>
+  </body>
+</html>

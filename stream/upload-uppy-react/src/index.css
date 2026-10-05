@@ -1,7 +1,19 @@
+/* bunny.net brand colours. light-dark() uses the first value in light mode. */
 :root {
   color-scheme: light dark;
+  --bunny-navy: #183d6d;
+  --bunny-ink: #03192e;
+  --bunny-sky: #e1f2ff;
+  --bunny-orange: #fd8d32;
+  --text: light-dark(var(--bunny-navy), var(--bunny-sky));
+  --surface: light-dark(#fff, var(--bunny-ink));
+  --tint: light-dark(#eaf6ff, #051e38);
+  --line: light-dark(#b5d7f7, #223c6a);
   font-family: system-ui, sans-serif;
   line-height: 1.5;
+  color: var(--text);
+  background: var(--surface);
+  accent-color: var(--bunny-orange);
 }
 
 body {
@@ -21,7 +33,7 @@ h1 {
 
 p {
   margin: 0 0 1.5rem;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 code {
@@ -39,11 +51,20 @@ code {
 button {
   font: inherit;
   padding: 0.375rem 0.875rem;
-  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border: 1px solid var(--line);
   border-radius: 0.375rem;
   background: transparent;
   color: inherit;
   cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--bunny-orange);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--bunny-orange);
+  outline-offset: 2px;
 }
 
 button:disabled {
@@ -52,7 +73,9 @@ button:disabled {
 }
 
 button[aria-pressed="true"] {
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  border-color: var(--bunny-orange);
+  background: var(--bunny-orange);
+  color: var(--bunny-ink);
 }
 
 .time {
@@ -70,7 +93,7 @@ progress {
   margin: 1.5rem 0 0;
   padding: 1rem;
   border-radius: 0.375rem;
-  background: color-mix(in srgb, currentColor 6%, transparent);
+  background: var(--tint);
   font-family: ui-monospace, monospace;
   font-size: 0.8125rem;
   list-style: none;
@@ -79,8 +102,9 @@ progress {
 
 .empty {
   padding: 1.5rem;
-  border: 1px dashed color-mix(in srgb, currentColor 30%, transparent);
+  border: 1px dashed var(--line);
   border-radius: 0.375rem;
+  background: var(--tint);
 }
 
 h2 {
@@ -103,7 +127,7 @@ h3 {
 }
 
 .error {
-  color: #dc2626;
+  color: light-dark(#dc2626, #ff7754);
   opacity: 1;
 }
 

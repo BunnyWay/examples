@@ -1,0 +1,72 @@
+---
+type Props = {
+  libraryId: string;
+  videoId: string;
+  /** Player parameters such as autoplay, muted, captions, or t. */
+  params?: Record<string, string | number | boolean>;
+  title?: string;
+};
+
+const { libraryId, videoId, params = {}, title = "Video player" } = Astro.props;
+
+const query = new URLSearchParams(
+  Object.entries(params).map(([key, value]) => [key, String(value)]),
+).toString();
+const src = `https://player.mediadelivery.net/embed/${libraryId}/${videoId}${query ? `?${query}` : ""}`;
+---
+
+<bunny-player>
+  <!-- The script sets src and creates the Player in one go, so the iframe
+       cannot send its ready message before anyone is listening. -->
+  <iframe
+    data-src={src}
+    title={title}
+    loading="lazy"
+    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+    allowfullscreen></iframe>
+</bunny-player>
+
+<script>
+  // Astro runs this in the browser only, so player.js can read window on import.
+  import playerjs, { type Player } from "player.js";
+
+  class BunnyPlayerElement extends HTMLElement {
+    player: Player | null = null;
+
+    connectedCallback() {
+      const iframe = this.querySelector("iframe");
+      if (this.player || !iframe?.dataset.src) return;
+
+      iframe.src = iframe.dataset.src;
+      const player = new playerjs.Player(iframe);
+      this.player = player;
+
+      player.on("ready", () => this.emit("ready", player));
+      player.on("play", () => this.emit("play"));
+      player.on("pause", () => this.emit("pause"));
+      player.on("ended", () => this.emit("ended"));
+      player.on("timeupdate", (time) => this.emit("timeupdate", time));
+    }
+
+    private emit(type: string, detail?: unknown) {
+      this.dispatchEvent(new CustomEvent(type, { detail }));
+    }
+  }
+
+  customElements.define("bunny-player", BunnyPlayerElement);
+</script>
+
+<style>
+  bunny-player {
+    display: block;
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    background: #000;
+  }
+</style>
