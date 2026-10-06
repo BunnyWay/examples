@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { hasFailed, VideoStatusCode, type VideoStatus } from "$lib/bunny-stream";
+	import { hasFailed, VideoStatusCode, type VideoStatus } from "#lib/bunny-stream.ts";
 
 	let { videoId, title }: { videoId: string; title: string } = $props();
 

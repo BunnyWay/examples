@@ -7,7 +7,7 @@ const SIGNATURE_TTL_SECONDS = 24 * 60 * 60;
 function config() {
   const { bunnyStreamLibraryId, bunnyStreamApiKey } = useRuntimeConfig();
   if (!bunnyStreamLibraryId || !bunnyStreamApiKey) {
-    throw new Error("Set NUXT_BUNNY_STREAM_LIBRARY_ID and NUXT_BUNNY_STREAM_API_KEY in .env");
+    throw new Error("Set NUXT_BUNNY_STREAM_LIBRARY_ID and NUXT_BUNNY_STREAM_API_KEY in .env or the server environment");
   }
 
   // Nuxt parses NUXT_* values, so a numeric library ID arrives as a number.

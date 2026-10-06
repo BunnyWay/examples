@@ -14,7 +14,7 @@ export function signEmbedUrl(): SignedEmbed {
   const { bunnyStreamLibraryId, bunnyStreamVideoId, bunnyStreamTokenAuthKey } = useRuntimeConfig();
   if (!bunnyStreamLibraryId || !bunnyStreamVideoId || !bunnyStreamTokenAuthKey) {
     throw new Error(
-      "Set NUXT_BUNNY_STREAM_LIBRARY_ID, NUXT_BUNNY_STREAM_VIDEO_ID, and NUXT_BUNNY_STREAM_TOKEN_AUTH_KEY in .env",
+      "Set NUXT_BUNNY_STREAM_LIBRARY_ID, NUXT_BUNNY_STREAM_VIDEO_ID, and NUXT_BUNNY_STREAM_TOKEN_AUTH_KEY in .env or the server environment",
     );
   }
 

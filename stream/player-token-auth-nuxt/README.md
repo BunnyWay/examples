@@ -26,6 +26,10 @@ Links last an hour (`EMBED_TOKEN_TTL_SECONDS`). Each page load signs a fresh one
 
 The route has no auth check, so anyone who can open the page can watch the video. Put it behind your own sign-in before you deploy.
 
+## Run in production
+
+`nuxt preview` loads `.env`, but `node .output/server/index.mjs` doesn't. Set the variables in your host's environment before you start the production server.
+
 ## Docs
 
 - [Embedded view token authentication](https://docs.bunny.net/stream/token-authentication)

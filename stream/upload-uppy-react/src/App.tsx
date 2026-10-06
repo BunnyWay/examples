@@ -13,11 +13,47 @@ import "./index.css";
 // credentials live on the file's meta too, but are sent as headers.
 type Meta = { filetype?: string; title?: string } & Partial<UploadCredentials>;
 
-async function requestUpload(title: string): Promise<UploadCredentials> {
+const TUS_ENDPOINT = "https://video.bunnycdn.com/tusupload";
+
+// Remembers which Bunny video a file was going into, so a retry or a reload
+// re-signs the same video instead of creating a new one.
+const videoKey = (fileId: string) => `bunny-video:${fileId}`;
+
+function readVideoId(fileId: string): string | null {
+  try {
+    return localStorage.getItem(videoKey(fileId));
+  } catch {
+    return null;
+  }
+}
+
+function writeVideoId(fileId: string, videoId: string | null) {
+  try {
+    if (videoId) localStorage.setItem(videoKey(fileId), videoId);
+    else localStorage.removeItem(videoKey(fileId));
+  } catch {
+    // Storage can be unavailable, for example in a private window. Resuming just won't survive a reload.
+  }
+}
+
+// Drops the TUS upload URLs stored for a file. A stored URL belongs to one
+// video, so it must not be resumed with another video's credentials.
+function forgetTusUploads(fileId: string) {
+  try {
+    const prefix = `tus::tus-${fileId}-${TUS_ENDPOINT}::`;
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith(prefix)) localStorage.removeItem(key);
+    }
+  } catch {
+    // Nothing stored, so nothing to forget.
+  }
+}
+
+async function requestUpload(title: string, videoId: string | null): Promise<UploadCredentials> {
   const response = await fetch("/api/uploads", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title }),
+    body: JSON.stringify({ title, videoId }),
   });
   const body = await response.json();
   if (!response.ok) throw new Error(body.error ?? "Could not create the upload");
@@ -29,7 +65,7 @@ function createUppy() {
   return new Uppy<Meta, Record<string, never>>({
     restrictions: { allowedFileTypes: ["video/*"] },
   }).use(Tus, {
-    endpoint: "https://video.bunnycdn.com/tusupload",
+    endpoint: TUS_ENDPOINT,
     retryDelays: [0, 3000, 5000, 10000, 20000, 60000],
     allowedMetaFields: ["filetype", "title"],
     removeFingerprintOnSuccess: true,
@@ -47,14 +83,21 @@ export function App() {
   const [videos, setVideos] = useState<{ id: string; title: string }[]>([]);
 
   useEffect(() => {
-    // Runs when the upload starts: create a video and sign it for each file.
+    // Runs when an upload starts, and again on every retry: sign a video for each file.
     const sign = async (fileIDs: string[]) => {
       await Promise.all(
         fileIDs.map(async (id) => {
           const file = uppy.getFile(id);
           const title = file.name ?? "Untitled video";
+          const savedVideoId = file.meta.videoId ?? readVideoId(id);
           try {
-            const credentials = await requestUpload(title);
+            const credentials = await requestUpload(title, savedVideoId);
+            if (credentials.videoId !== savedVideoId) {
+              // A new video, so start the file from scratch rather than resume into the old one.
+              forgetTusUploads(id);
+              uppy.setFileState(id, { tus: { uploadUrl: null } });
+            }
+            writeVideoId(id, credentials.videoId);
             uppy.setFileMeta(id, { filetype: file.type, title, ...credentials });
           } catch (error) {
             uppy.info((error as Error).message, "error", 10_000);
@@ -73,7 +116,8 @@ export function App() {
 
   useUppyEvent(uppy, "upload-success", (file) => {
     const videoId = file?.meta.videoId;
-    if (!videoId) return;
+    if (!file || !videoId) return;
+    writeVideoId(file.id, null);
     setVideos((current) => [...current, { id: String(videoId), title: file.name ?? "" }]);
   });
 

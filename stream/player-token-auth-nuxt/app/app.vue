@@ -19,9 +19,10 @@ const configured = useState("bunny-configured", () => {
     </p>
     <SignedPlayer v-if="configured" />
     <div v-else class="empty">
-      Copy <code>.env.example</code> to <code>.env</code> and set
-      <code>NUXT_BUNNY_STREAM_LIBRARY_ID</code>, <code>NUXT_BUNNY_STREAM_VIDEO_ID</code>, and
-      <code>NUXT_BUNNY_STREAM_TOKEN_AUTH_KEY</code>, then restart the dev server.
+      Set <code>NUXT_BUNNY_STREAM_LIBRARY_ID</code>, <code>NUXT_BUNNY_STREAM_VIDEO_ID</code>, and
+      <code>NUXT_BUNNY_STREAM_TOKEN_AUTH_KEY</code>. For <code>bun dev</code>, copy
+      <code>.env.example</code> to <code>.env</code> and restart. In production, set them in your
+      host's environment.
     </div>
   </main>
 </template>

@@ -27,6 +27,9 @@ export function mountVideoUploader(root) {
   let upload = null;
   let stopPolling = null;
   let showProgress = null;
+  // Bumped by every new upload and by Cancel, so a start() that is still waiting
+  // on the server can tell it has been cancelled.
+  let attempt = 0;
 
   function setState(next) {
     state = next;
@@ -37,19 +40,21 @@ export function mountVideoUploader(root) {
     const title = file.name;
     const key = videoKey(file);
     const savedVideoId = localStorage.getItem(key);
+    const current = ++attempt;
     setState({ phase: "uploading", title, percent: 0, resumed: false });
 
     let credentials;
     try {
       credentials = await requestUpload(title, savedVideoId);
     } catch (error) {
-      setState({ phase: "error", message: error.message });
+      if (current === attempt) setState({ phase: "error", message: error.message });
       return;
     }
+    if (current !== attempt) return;
     localStorage.setItem(key, credentials.videoId);
 
     let resumed = false;
-    upload = new tus.Upload(file, {
+    const next = new tus.Upload(file, {
       endpoint: "https://video.bunnycdn.com/tusupload",
       retryDelays: [0, 3000, 5000, 10000, 20000, 60000],
       removeFingerprintOnSuccess: true,
@@ -77,12 +82,15 @@ export function mountVideoUploader(root) {
 
     // The stored upload URL belongs to one video. Only resume when the server
     // re-signed that same video, otherwise start over in the new one.
-    const previous = await upload.findPreviousUploads();
+    const previous = await next.findPreviousUploads();
+    if (current !== attempt) return;
     if (credentials.videoId === savedVideoId && previous[0]) {
-      upload.resumeFromPreviousUpload(previous[0]);
+      next.resumeFromPreviousUpload(previous[0]);
       resumed = true;
     }
-    upload.start();
+    upload = next;
+    // Pause may have been pressed while we waited. Resume starts it later.
+    if (state.phase === "uploading") upload.start();
   }
 
   function pause() {
@@ -96,6 +104,7 @@ export function mountVideoUploader(root) {
   }
 
   function reset() {
+    attempt++;
     upload?.abort();
     upload = null;
     setState({ phase: "idle" });

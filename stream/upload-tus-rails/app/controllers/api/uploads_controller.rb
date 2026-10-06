@@ -2,6 +2,8 @@
 # unfinished upload to re-sign it, so the browser can resume.
 class Api::UploadsController < ApplicationController
   def create
+    # Require a signed-in user here. This route is public and creates videos in your library.
+    # Before re-signing a videoId, check that the user owns it.
     title, video_id = params.values_at(:title, :videoId)
     unless title.is_a?(String) && title.present?
       return render json: { error: "title is required" }, status: :bad_request

@@ -18,6 +18,8 @@ In the Bunny Stream dashboard, open your library's **Security** page and enable 
 
 Anyone who copies the signed URL can play the video until it expires. Shorten `TOKEN_TTL_SECONDS` to narrow that window, and put the page behind your own sign-in before you deploy.
 
+Before you deploy, swap `@sveltejs/adapter-auto` in [`vite.config.ts`](vite.config.ts) for the [adapter](https://svelte.dev/docs/kit/adapters) that matches your host, and set the variables in its environment. The production server doesn't read `.env`.
+
 ## Where the code lives
 
 - [`src/lib/server/bunny-stream.ts`](src/lib/server/bunny-stream.ts): Server-only signing of the embed URL.

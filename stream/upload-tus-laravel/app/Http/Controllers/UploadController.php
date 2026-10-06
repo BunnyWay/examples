@@ -15,6 +15,8 @@ class UploadController extends Controller
     // unfinished upload to re-sign it, so the browser can resume.
     public function __invoke(Request $request): JsonResponse
     {
+        // Require a signed-in user here. This route is public and creates videos in your library.
+        // Before re-signing a videoId, check that the user owns it.
         $title = $request->input('title');
         $videoId = $request->input('videoId');
         if (! is_string($title) || trim($title) === '') {

@@ -19,6 +19,10 @@ Bring the `player.js.d.ts` file along too, since player.js ships without types.
 
 Change `PUBLIC_BUNNY_LIBRARY_ID` and `PUBLIC_BUNNY_VIDEO_ID` in [`.env`](.env) to the IDs from your video's page in the Bunny Stream dashboard, then restart `bun dev`.
 
+## Deploy
+
+Before you deploy, swap `@sveltejs/adapter-auto` in [`vite.config.ts`](vite.config.ts) for the [adapter](https://svelte.dev/docs/kit/adapters) that matches your host.
+
 ## Docs
 
 - [Svelte and SvelteKit guide](https://docs.bunny.net/stream/player/svelte)

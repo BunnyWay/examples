@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { env } from "$env/dynamic/private";
+import { BUNNY_STREAM_LIBRARY_ID, BUNNY_STREAM_TOKEN_AUTH_KEY } from "$app/env/private";
 
 // How long a signed embed link stays valid. Keep it short so a copied link
 // soon stops working. Every page load signs a fresh one.
@@ -12,12 +12,12 @@ export type SignedEmbed = {
 };
 
 export function isConfigured(): boolean {
-	return Boolean(env.BUNNY_STREAM_LIBRARY_ID && env.BUNNY_STREAM_TOKEN_AUTH_KEY);
+	return Boolean(BUNNY_STREAM_LIBRARY_ID && BUNNY_STREAM_TOKEN_AUTH_KEY);
 }
 
 function config() {
-	const libraryId = env.BUNNY_STREAM_LIBRARY_ID;
-	const tokenKey = env.BUNNY_STREAM_TOKEN_AUTH_KEY;
+	const libraryId = BUNNY_STREAM_LIBRARY_ID;
+	const tokenKey = BUNNY_STREAM_TOKEN_AUTH_KEY;
 	if (!libraryId || !tokenKey) {
 		throw new Error("Set BUNNY_STREAM_LIBRARY_ID and BUNNY_STREAM_TOKEN_AUTH_KEY in .env");
 	}

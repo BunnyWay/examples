@@ -1,17 +1,17 @@
 import { createHash } from "node:crypto";
-import { env } from "$env/dynamic/private";
-import type { UploadCredentials, VideoStatus } from "$lib/bunny-stream";
+import { BUNNY_STREAM_API_KEY, BUNNY_STREAM_LIBRARY_ID } from "$app/env/private";
+import type { UploadCredentials, VideoStatus } from "#lib/bunny-stream.ts";
 
 // Long enough for a slow upload to finish. Bunny checks the expiry on every TUS request.
 const SIGNATURE_TTL_SECONDS = 24 * 60 * 60;
 
 export function isConfigured(): boolean {
-	return Boolean(env.BUNNY_STREAM_LIBRARY_ID && env.BUNNY_STREAM_API_KEY);
+	return Boolean(BUNNY_STREAM_LIBRARY_ID && BUNNY_STREAM_API_KEY);
 }
 
 function config() {
-	const libraryId = env.BUNNY_STREAM_LIBRARY_ID;
-	const apiKey = env.BUNNY_STREAM_API_KEY;
+	const libraryId = BUNNY_STREAM_LIBRARY_ID;
+	const apiKey = BUNNY_STREAM_API_KEY;
 	if (!libraryId || !apiKey) {
 		throw new Error("Set BUNNY_STREAM_LIBRARY_ID and BUNNY_STREAM_API_KEY in .env");
 	}

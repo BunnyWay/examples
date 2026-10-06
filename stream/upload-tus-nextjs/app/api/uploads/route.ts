@@ -4,6 +4,7 @@ import { VideoStatusCode } from "@/lib/video-status";
 // Creates a video and signs a TUS upload for it. Pass the videoId of an
 // unfinished upload to re-sign it, so the browser can resume.
 export async function POST(request: Request) {
+  // Require a signed-in user here. This route is public, and it creates videos in your library.
   const { title, videoId } = (await request.json()) as { title?: unknown; videoId?: unknown };
   if (typeof title !== "string" || !title.trim()) {
     return Response.json({ error: "title is required" }, { status: 400 });

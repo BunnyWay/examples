@@ -17,7 +17,10 @@ STATUS_CREATED = 0
 
 
 class BunnyStreamError(Exception):
-    pass
+    def __init__(self, message: str, status: int = 502):
+        super().__init__(message)
+        # 404 when Bunny Stream has no such video, 502 for anything else.
+        self.status = status
 
 
 class UploadCredentials(TypedDict):
@@ -58,7 +61,10 @@ def _stream(path: str, *, method: str = "GET", body: dict[str, Any] | None = Non
         with urlopen(request, timeout=30) as response:
             return json.load(response)
     except HTTPError as error:
-        raise BunnyStreamError(f"Bunny Stream returned {error.code}: {error.read().decode()}") from error
+        raise BunnyStreamError(
+            f"Bunny Stream returned {error.code}: {error.read().decode()}",
+            404 if error.code == 404 else 502,
+        ) from error
     except URLError as error:
         raise BunnyStreamError(f"Could not reach Bunny Stream: {error.reason}") from error
 

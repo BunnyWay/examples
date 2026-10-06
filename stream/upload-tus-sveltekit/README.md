@@ -28,6 +28,8 @@ If you reload mid-upload and pick the same file again, the server re-signs the s
 
 The upload routes have no auth check. Put them behind your own sign-in before you deploy.
 
+Before you deploy, swap `@sveltejs/adapter-auto` in [`vite.config.ts`](vite.config.ts) for the [adapter](https://svelte.dev/docs/kit/adapters) that matches your host, and set the variables in its environment. The production server doesn't read `.env`.
+
 ## Docs
 
 - [TUS resumable uploads](https://docs.bunny.net/stream/tus-resumable-uploads)

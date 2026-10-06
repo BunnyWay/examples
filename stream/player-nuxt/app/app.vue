@@ -18,7 +18,7 @@ const videoId = String(config.bunnyVideoId);
     </template>
     <div v-else class="empty">
       Set <code>NUXT_PUBLIC_BUNNY_LIBRARY_ID</code> and <code>NUXT_PUBLIC_BUNNY_VIDEO_ID</code> in
-      <code>.env</code>, then restart the dev server.
+      <code>.env</code> for <code>bun dev</code>, or in your host's environment in production.
     </div>
   </main>
 </template>

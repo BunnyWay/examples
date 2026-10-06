@@ -1,6 +1,6 @@
 <script lang="ts">
 	import * as tus from "tus-js-client";
-	import type { UploadCredentials } from "$lib/bunny-stream";
+	import type { UploadCredentials } from "#lib/bunny-stream.ts";
 	import UploadedVideo from "./UploadedVideo.svelte";
 
 	type UploadState =

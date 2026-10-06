@@ -71,6 +71,7 @@ final readonly class BunnyStream
             ->acceptJson()
             ->throw(fn (Response $response) => throw new RuntimeException(
                 "Bunny Stream returned {$response->status()}: {$response->body()}",
+                $response->status(),
             ));
     }
 

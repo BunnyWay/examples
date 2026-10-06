@@ -9,7 +9,7 @@ from . import bunny_stream
 
 @require_GET
 def index(request: HttpRequest) -> HttpResponse:
-    # Read the environment per request, so the page reflects the current .env.
+    # Without the two variables, the page explains how to set them.
     return render(request, "uploads/index.html", {"configured": bunny_stream.is_configured()})
 
 
@@ -17,6 +17,8 @@ def index(request: HttpRequest) -> HttpResponse:
 # unfinished upload to re-sign it, so the browser can resume.
 @require_POST
 def create_upload(request: HttpRequest) -> JsonResponse:
+    # Require a signed-in user here. This route is public and creates videos in your library.
+    # Before re-signing a videoId, check that the user owns it.
     try:
         payload = json.loads(request.body)
     except json.JSONDecodeError:
@@ -40,10 +42,11 @@ def create_upload(request: HttpRequest) -> JsonResponse:
 
 @require_GET
 def video_status(request: HttpRequest, video_id: str) -> JsonResponse:
+    # Require a signed-in user here, and check that they own this video ID. The route is public.
     try:
         return JsonResponse(bunny_stream.get_video(video_id))
     except bunny_stream.BunnyStreamError as error:
-        return JsonResponse({"error": str(error)}, status=502)
+        return JsonResponse({"error": str(error)}, status=error.status)
 
 
 # Only re-sign videos that are still waiting for their file.

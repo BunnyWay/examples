@@ -4,7 +4,14 @@ require "net/http"
 module BunnyStream
   extend self
 
-  class Error < StandardError; end
+  class Error < StandardError
+    attr_reader :status
+
+    def initialize(message, status = :bad_gateway)
+      super(message)
+      @status = status
+    end
+  end
 
   # The status of a video that is still waiting for its file.
   CREATED = 0
@@ -57,7 +64,10 @@ module BunnyStream
     request.body = body.to_json if body
 
     response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) { |http| http.request(request) }
-    raise Error, "Bunny Stream returned #{response.code}: #{response.body}" unless response.is_a?(Net::HTTPSuccess)
+    unless response.is_a?(Net::HTTPSuccess)
+      status = response.is_a?(Net::HTTPNotFound) ? :not_found : :bad_gateway
+      raise Error.new("Bunny Stream returned #{response.code}: #{response.body}", status)
+    end
 
     JSON.parse(response.body)
   rescue SocketError, SystemCallError, Timeout::Error, OpenSSL::SSL::SSLError => error

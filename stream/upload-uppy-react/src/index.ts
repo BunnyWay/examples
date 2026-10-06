@@ -43,17 +43,37 @@ async function stream(path: string, init?: RequestInit): Promise<Response> {
   return response;
 }
 
-async function createUpload(title: string): Promise<UploadCredentials> {
+async function getVideoStatus(videoId: string): Promise<number> {
+  const video = (await (await stream(`/${encodeURIComponent(videoId)}`)).json()) as { status: number };
+
+  return video.status;
+}
+
+async function createVideo(title: string): Promise<string> {
   // TUS needs an existing video object to upload into.
   const video = (await (await stream("", { method: "POST", body: JSON.stringify({ title }) })).json()) as {
     guid: string;
   };
+
+  return video.guid;
+}
+
+function signUpload(videoId: string): UploadCredentials {
   const expirationTime = Math.floor(Date.now() / 1000) + SIGNATURE_TTL_SECONDS;
   const signature = new Bun.CryptoHasher("sha256")
-    .update(`${libraryId}${apiKey}${expirationTime}${video.guid}`)
+    .update(`${libraryId}${apiKey}${expirationTime}${videoId}`)
     .digest("hex");
 
-  return { videoId: video.guid, libraryId, expirationTime, signature };
+  return { videoId, libraryId, expirationTime, signature };
+}
+
+// Only re-sign videos that are still waiting for their file (status 0, Created).
+async function canResume(videoId: string): Promise<boolean> {
+  try {
+    return (await getVideoStatus(videoId)) === 0;
+  } catch {
+    return false;
+  }
 }
 
 function errorResponse(error: unknown): Response {
@@ -68,13 +88,19 @@ const server = serve({
 
     "/api/uploads": {
       async POST(req) {
-        const { title } = (await req.json()) as { title?: unknown };
+        // Require a signed-in user here. This route is public, and it creates videos in your library.
+        const { title, videoId } = (await req.json()) as { title?: unknown; videoId?: unknown };
         if (typeof title !== "string" || !title.trim()) {
           return Response.json({ error: "title is required" }, { status: 400 });
         }
 
         try {
-          return Response.json(await createUpload(title));
+          // Pass the videoId of an unfinished upload to re-sign it, so Uppy can resume.
+          if (typeof videoId === "string" && (await canResume(videoId))) {
+            return Response.json(signUpload(videoId));
+          }
+
+          return Response.json(signUpload(await createVideo(title)));
         } catch (error) {
           return errorResponse(error);
         }
@@ -83,6 +109,7 @@ const server = serve({
 
     "/api/videos/:id": {
       async GET(req) {
+        // Require a signed-in user here, and check they own this video ID. This route is public.
         try {
           const id = encodeURIComponent(req.params.id);
           const video = (await (await stream(`/${id}`)).json()) as { status: number; encodeProgress: number };

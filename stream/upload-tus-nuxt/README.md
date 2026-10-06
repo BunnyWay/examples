@@ -28,6 +28,10 @@ If you reload mid-upload and pick the same file again, the server re-signs the s
 
 The upload routes have no auth check. Put them behind your own sign-in before you deploy.
 
+## Run in production
+
+`nuxt preview` loads `.env`, but `node .output/server/index.mjs` doesn't. Set the variables in your host's environment before you start the production server.
+
 ## Docs
 
 - [TUS resumable uploads](https://docs.bunny.net/stream/tus-resumable-uploads)

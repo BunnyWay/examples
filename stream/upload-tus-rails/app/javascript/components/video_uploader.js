@@ -28,6 +28,7 @@ export class VideoUploader {
   #upload = null;
   #video = null;
   #progressView = null;
+  #attempt = 0;
 
   constructor(root) {
     this.#root = root;
@@ -38,15 +39,17 @@ export class VideoUploader {
     const title = file.name;
     const key = videoKey(file);
     const savedVideoId = localStorage.getItem(key);
+    const attempt = ++this.#attempt;
     this.#setState({ phase: "uploading", title, percent: 0, resumed: false });
 
     let credentials;
     try {
       credentials = await requestUpload(title, savedVideoId);
     } catch (error) {
-      this.#setState({ phase: "error", message: error.message });
+      if (attempt === this.#attempt) this.#setState({ phase: "error", message: error.message });
       return;
     }
+    if (attempt !== this.#attempt) return;
     localStorage.setItem(key, credentials.videoId);
 
     let resumed = false;
@@ -74,16 +77,17 @@ export class VideoUploader {
         this.#setState({ phase: "error", message: error.message });
       },
     });
-    this.#upload = upload;
 
     // The stored upload URL belongs to one video. Only resume when the server
     // re-signed that same video, otherwise start over in the new one.
     const previous = await upload.findPreviousUploads();
+    if (attempt !== this.#attempt) return;
     if (credentials.videoId === savedVideoId && previous[0]) {
       upload.resumeFromPreviousUpload(previous[0]);
       resumed = true;
     }
-    upload.start();
+    this.#upload = upload;
+    if (this.#state.phase === "uploading") upload.start();
   }
 
   #pause() {
@@ -97,6 +101,7 @@ export class VideoUploader {
   }
 
   #reset() {
+    this.#attempt++;
     this.#upload?.abort();
     this.#upload = null;
     this.#setState({ phase: "idle" });

@@ -15,6 +15,7 @@ async function canResume(videoId: string): Promise<boolean> {
 // Creates a video and signs a TUS upload for it. Pass the videoId of an
 // unfinished upload to re-sign it, so the browser can resume.
 export default defineEventHandler(async (event) => {
+  // Require a signed-in user here. This route is public, and it creates videos in your library.
   const { title, videoId } = await readBody<{ title?: unknown; videoId?: unknown }>(event);
   if (typeof title !== "string" || !title.trim()) {
     setResponseStatus(event, 400);

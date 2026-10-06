@@ -99,10 +99,3 @@ progress {
   list-style: none;
   min-height: 7.5rem;
 }
-
-.empty {
-  padding: 1.5rem;
-  border: 1px dashed var(--line);
-  border-radius: 0.375rem;
-  background: var(--tint);
-}

@@ -8,9 +8,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      // Set with NUXT_PUBLIC_BUNNY_LIBRARY_ID and NUXT_PUBLIC_BUNNY_VIDEO_ID.
-      bunnyLibraryId: "",
-      bunnyVideoId: "",
+      bunnyLibraryId: "767357",
+      bunnyVideoId: "6dae38a5-9322-401a-a6e6-76e7cbb368dd",
     },
   },
 });

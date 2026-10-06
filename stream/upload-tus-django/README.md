@@ -4,10 +4,15 @@ In this Django app, the browser uploads videos straight to Bunny Stream over [TU
 
 ```bash
 cp .env.example .env
+```
+
+Set `BUNNY_STREAM_LIBRARY_ID` and `BUNNY_STREAM_API_KEY` in `.env` from your library's **API** page, then start the server with [uv](https://docs.astral.sh/uv/):
+
+```bash
 uv run --env-file .env manage.py runserver
 ```
 
-Set `BUNNY_STREAM_LIBRARY_ID` and `BUNNY_STREAM_API_KEY` from your library's **API** page, then open http://localhost:8000 and choose a video. `uv run` installs Django on the first run, and `--env-file` loads the two values into the server's environment.
+Open http://localhost:8000 and choose a video. `uv run` installs Django on the first run, and `--env-file` loads the two values when the server starts, so restart it after you change `.env`.
 
 ## How it works
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import VideoUploader from "$lib/components/VideoUploader.svelte";
+	import VideoUploader from "#lib/components/VideoUploader.svelte";
 
 	let { data } = $props();
 </script>
