@@ -11,8 +11,16 @@ let active = true;
 
 // Poll until Bunny Stream finishes encoding or gives up.
 async function poll() {
-  const response = await fetch(`/api/videos/${props.videoId}`);
-  const body = await response.json();
+  let response: Response;
+  let body;
+  try {
+    response = await fetch(`/api/videos/${props.videoId}`);
+    body = await response.json();
+  } catch {
+    // A dropped connection or a non-JSON error page.
+    if (active) error.value = "Could not reach the server to check the video";
+    return;
+  }
   if (!active) return;
   if (!response.ok) {
     error.value = body.error ?? "Could not read the video status";

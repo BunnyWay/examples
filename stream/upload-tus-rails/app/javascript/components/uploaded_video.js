@@ -27,8 +27,16 @@ export class UploadedVideo {
   }
 
   async #poll() {
-    const response = await fetch(`/api/videos/${this.#videoId}`);
-    const body = await response.json();
+    let response;
+    let body;
+    try {
+      response = await fetch(`/api/videos/${this.#videoId}`);
+      body = await response.json();
+    } catch {
+      // A dropped connection or a non-JSON error page.
+      if (this.#active) this.#show(element("p", { class: "error" }, "Could not reach the server to check the video"));
+      return;
+    }
     if (!this.#active) return;
     if (!response.ok) {
       this.#show(element("p", { class: "error" }, body.error ?? "Could not read the video status"));
