@@ -46,20 +46,22 @@ watch(
   (el, _previous, onCleanup) => {
     if (!el || !playerjs.value) return;
 
-    // player.js has no teardown API. This flag stops stale listeners
-    // from firing after the video changes or the component unmounts.
-    let active = true;
-    const instance = new playerjs.value.Player(el);
+    const pjs = playerjs.value;
+    let onMessage: EventListener = () => {};
+    const addEvent = pjs.addEvent;
+    pjs.addEvent = (elem, type, handler) => addEvent(elem, type, (onMessage = handler));
+    const instance = new pjs.Player(el);
+    pjs.addEvent = addEvent;
 
-    instance.on("ready", () => active && emit("ready", instance));
-    instance.on("play", () => active && emit("play"));
-    instance.on("pause", () => active && emit("pause"));
-    instance.on("ended", () => active && emit("ended"));
-    instance.on("timeupdate", (time) => active && emit("timeupdate", time));
+    instance.on("ready", () => emit("ready", instance));
+    instance.on("play", () => emit("play"));
+    instance.on("pause", () => emit("pause"));
+    instance.on("ended", () => emit("ended"));
+    instance.on("timeupdate", (time) => emit("timeupdate", time));
 
     player.value = instance;
     onCleanup(() => {
-      active = false;
+      window.removeEventListener("message", onMessage);
       player.value = null;
     });
   },

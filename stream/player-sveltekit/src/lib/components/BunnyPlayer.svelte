@@ -49,20 +49,19 @@
 	$effect(() => {
 		if (!playerjs || !iframe) return;
 
-		// player.js has no teardown API. This flag stops stale listeners
-		// from firing after the video changes or the component unmounts.
-		let active = true;
+		let onMessage: EventListener = () => {};
+		const addEvent = playerjs.addEvent;
+		playerjs.addEvent = (elem, type, handler) => addEvent(elem, type, (onMessage = handler));
 		const player = new playerjs.Player(iframe);
+		playerjs.addEvent = addEvent;
 
-		player.on("ready", () => active && onready?.(player));
-		player.on("play", () => active && onplay?.());
-		player.on("pause", () => active && onpause?.());
-		player.on("ended", () => active && onended?.());
-		player.on("timeupdate", (time) => active && ontimeupdate?.(time));
+		player.on("ready", () => onready?.(player));
+		player.on("play", () => onplay?.());
+		player.on("pause", () => onpause?.());
+		player.on("ended", () => onended?.());
+		player.on("timeupdate", (time) => ontimeupdate?.(time));
 
-		return () => {
-			active = false;
-		};
+		return () => window.removeEventListener("message", onMessage);
 	});
 </script>
 

@@ -42,20 +42,19 @@ export function BunnyPlayer({
     const iframe = iframeRef.current;
     if (!iframe) return;
 
-    // player.js has no teardown API. This flag stops stale listeners
-    // from firing after the video changes or the component unmounts.
-    let active = true;
+    let onMessage: EventListener = () => {};
+    const addEvent = playerjs.addEvent;
+    playerjs.addEvent = (elem, type, handler) => addEvent(elem, type, (onMessage = handler));
     const player = new playerjs.Player(iframe);
+    playerjs.addEvent = addEvent;
 
-    player.on("ready", () => active && handlers.current.onReady?.(player));
-    player.on("play", () => active && handlers.current.onPlay?.());
-    player.on("pause", () => active && handlers.current.onPause?.());
-    player.on("ended", () => active && handlers.current.onEnded?.());
-    player.on("timeupdate", (time) => active && handlers.current.onTimeUpdate?.(time));
+    player.on("ready", () => handlers.current.onReady?.(player));
+    player.on("play", () => handlers.current.onPlay?.());
+    player.on("pause", () => handlers.current.onPause?.());
+    player.on("ended", () => handlers.current.onEnded?.());
+    player.on("timeupdate", (time) => handlers.current.onTimeUpdate?.(time));
 
-    return () => {
-      active = false;
-    };
+    return () => window.removeEventListener("message", onMessage);
   }, [src]);
 
   return (

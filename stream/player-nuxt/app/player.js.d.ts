@@ -44,6 +44,9 @@ declare module "player.js" {
     getLoop(callback: (loop: boolean) => void): void;
   }
 
-  const playerjs: { Player: typeof Player };
+  const playerjs: {
+    Player: typeof Player;
+    addEvent(elem: EventTarget, type: string, handler: EventListener): void;
+  };
   export default playerjs;
 }
