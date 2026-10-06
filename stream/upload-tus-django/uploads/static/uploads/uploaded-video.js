@@ -16,8 +16,16 @@ export function mountUploadedVideo(container, { videoId, title }) {
   const show = (element) => container.replaceChildren(element);
 
   const poll = async () => {
-    const response = await fetch(`/api/videos/${encodeURIComponent(videoId)}`);
-    const body = await response.json();
+    let response;
+    let body;
+    try {
+      response = await fetch(`/api/videos/${encodeURIComponent(videoId)}`);
+      body = await response.json();
+    } catch {
+      // A dropped connection or a non-JSON error page.
+      if (active) show(h("p", { className: "error" }, "Could not reach the server to check the video"));
+      return;
+    }
     if (!active) return;
     if (!response.ok) {
       show(h("p", { className: "error" }, body.error ?? "Could not read the video status"));
