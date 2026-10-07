@@ -1,0 +1,25 @@
+---
+import Layout from "../Layout.astro";
+
+if (Astro.request.method === "POST") {
+  const data = await Astro.request.formData();
+  Astro.cookies.set("name", String(data.get("name")), { httpOnly: true, sameSite: "lax", path: "/" });
+  return Astro.redirect("/cookie", 303);
+}
+
+const name = Astro.cookies.get("name")?.value;
+---
+
+<Layout title="Cookies and forms">
+  <h1>Cookies and forms</h1>
+  <p>
+    The CDN endpoint passes form posts and <code>Set-Cookie</code> through, so the name survives
+    a reload.
+  </p>
+  <p>Saved name: {name ? <code>{name}</code> : "none"}</p>
+  <form method="post">
+    <input name="name" value={name} required />
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="/">Back to images</a></p>
+</Layout>

@@ -1,0 +1,34 @@
+---
+import { Image } from "astro:assets";
+import Layout from "../Layout.astro";
+import optimizer from "../assets/optimizer.png";
+---
+
+<Layout title="Astro on bunny.net CDN and Optimizer">
+  <h1>Astro on bunny.net CDN and Optimizer</h1>
+  <p>
+    Built with <code>CDN_URL</code> set, scripts, styles, and images load from the pull zone.
+    Without it, everything loads from this server.
+  </p>
+
+  <h2>Responsive widths</h2>
+  <p>Astro builds a <code>srcset</code>, and Optimizer resizes the image for each <code>?width=</code>.</p>
+  <Image
+    src="/images/hero.png"
+    alt="A bunny watching a machine turn HTML into Markdown"
+    width={1737}
+    height={893}
+    layout="constrained"
+    loading="eager"
+  />
+
+  <h2>Imported images</h2>
+  <p>
+    An image in <code>src/assets</code> gets a hashed <code>/_astro</code> URL, and goes through
+    Optimizer the same way.
+  </p>
+  <Image src={optimizer} alt="Bunny Optimizer illustration" layout="constrained" quality={50} />
+
+  <h2>Cookies and forms</h2>
+  <p><a href="/cookie">Save a cookie with a form post</a> to test a whole-site pull zone.</p>
+</Layout>

@@ -1,0 +1,6 @@
+{
+  "sites": {
+    "build": "bun run build",
+    "dir": "out"
+  }
+}

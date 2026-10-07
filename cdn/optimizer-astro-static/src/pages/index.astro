@@ -1,0 +1,29 @@
+---
+import { Image } from "astro:assets";
+import Layout from "../Layout.astro";
+import optimizer from "../assets/optimizer.png";
+---
+
+<Layout title="Astro on bunny.net CDN and Optimizer">
+  <h1>Astro on bunny.net CDN and Optimizer</h1>
+  <p>A static build on Bunny Storage. Optimizer resizes each image at the edge, so the build never does.</p>
+
+  <h2>Responsive widths</h2>
+  <p>Astro builds a <code>srcset</code>, and Optimizer resizes the image for each <code>?width=</code>.</p>
+  <Image
+    src="/images/hero.png"
+    alt="A bunny watching a machine turn HTML into Markdown"
+    width={1737}
+    height={893}
+    layout="constrained"
+    loading="eager"
+  />
+
+  <h2>Imported images</h2>
+  <p>
+    An image in <code>src/assets</code> gets a hashed <code>/_astro</code> URL, and goes through
+    Optimizer the same way.
+  </p>
+  <Image src={optimizer} alt="Bunny Optimizer illustration" layout="constrained" quality={50} />
+
+</Layout>
