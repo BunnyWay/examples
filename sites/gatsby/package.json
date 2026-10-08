@@ -1,0 +1,14 @@
+{
+  "name": "sites-gatsby",
+  "private": true,
+  "scripts": {
+    "develop": "gatsby develop",
+    "build": "gatsby build",
+    "serve": "gatsby serve"
+  },
+  "dependencies": {
+    "gatsby": "^5.16.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  }
+}

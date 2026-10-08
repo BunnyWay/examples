@@ -1,0 +1,8 @@
+{# A plain <img> by default. With optimizer=true, each srcset width is a Bunny Optimizer URL. #}
+{% component bunny_image(src, alt, width, height, sizes="100vw", optimizer=false) %}
+{%- if optimizer -%}
+<img src="{{ src }}?width=1280&quality=75" srcset="{% for w in [640, 960, 1280, 1920] %}{{ src }}?width={{ w }}&quality=75 {{ w }}w{% if not loop.last %}, {% endif %}{% endfor %}" sizes="{{ sizes }}" alt="{{ alt }}" width="{{ width }}" height="{{ height }}" />
+{%- else -%}
+<img src="{{ src }}" alt="{{ alt }}" width="{{ width }}" height="{{ height }}" />
+{%- endif -%}
+{% endcomponent bunny_image %}

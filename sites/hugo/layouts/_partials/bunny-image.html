@@ -1,0 +1,10 @@
+{{- /* A plain <img> by default. With HUGO_BUNNY_OPTIMIZER=true, each srcset width is a Bunny Optimizer URL. */ -}}
+{{- if eq (os.Getenv "HUGO_BUNNY_OPTIMIZER") "true" -}}
+  {{- $srcset := slice -}}
+  {{- range slice 640 960 1280 1920 -}}
+    {{- $srcset = $srcset | append (printf "%s?width=%d&quality=75 %dw" $.src . .) -}}
+  {{- end -}}
+  <img src="{{ printf "%s?width=1280&quality=75" .src }}" srcset="{{ delimit $srcset ", " }}" sizes="{{ .sizes | default "100vw" }}" alt="{{ .alt }}" width="{{ .width }}" height="{{ .height }}" />
+{{- else -}}
+  <img src="{{ .src }}" alt="{{ .alt }}" width="{{ .width }}" height="{{ .height }}" />
+{{- end -}}

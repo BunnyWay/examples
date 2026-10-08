@@ -1,0 +1,15 @@
+body {
+	font-family: system-ui, sans-serif;
+	max-width: 40rem;
+	margin: 4rem auto;
+	padding: 0 1rem;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+nav a {
+	margin-right: 1rem;
+}

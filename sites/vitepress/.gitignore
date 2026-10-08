@@ -1,0 +1,12 @@
+# dependencies
+node_modules/
+
+# build output
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# bunny sites link
+.bunny/
+
+# misc
+.DS_Store

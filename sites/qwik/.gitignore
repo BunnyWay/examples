@@ -1,0 +1,7 @@
+/dist
+/server
+node_modules
+.env
+*.local
+.DS_Store
+.bunny

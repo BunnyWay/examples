@@ -1,0 +1,6 @@
+title = "Zola on Bunny Storage"
+base_url = "https://sites-example-zola-21hbec.b-cdn.net"
+
+[extra]
+# Set to true to serve images through Bunny Optimizer. See README.md.
+bunny_optimizer = false

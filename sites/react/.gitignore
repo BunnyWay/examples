@@ -1,0 +1,8 @@
+node_modules
+build
+.env*.local
+*.log
+.DS_Store
+
+# bunny sites link
+.bunny

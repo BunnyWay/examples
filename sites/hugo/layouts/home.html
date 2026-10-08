@@ -1,0 +1,5 @@
+{{ define "main" }}
+  <h1>{{ site.Title }}</h1>
+  {{ .Content }}
+  {{ partial "bunny-image.html" (dict "src" "/images/hero.png" "alt" "A bunny watching a machine turn HTML into Markdown" "width" 1737 "height" 893) }}
+{{ end }}

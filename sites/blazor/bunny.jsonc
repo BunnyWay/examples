@@ -1,0 +1,7 @@
+{
+  "sites": {
+    "build": "dotnet publish -c Release -o bin/publish",
+    "dir": "bin/publish/wwwroot",
+    "spa": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "my-app",
+  "private": true,
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build --define BUNNY_OPTIMIZER=\\\"${BUNNY_OPTIMIZER:-false}\\\""
+  },
+  "dependencies": {
+    "@angular/common": "^22.2.1",
+    "@angular/compiler": "^22.2.1",
+    "@angular/core": "^22.2.1",
+    "@angular/platform-browser": "^22.2.1",
+    "@angular/router": "^22.2.1",
+    "rxjs": "^7.8.2",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.2",
+    "@angular/cli": "^22.2.2",
+    "@angular/compiler-cli": "^22.2.1",
+    "typescript": "~6.0.3"
+  }
+}

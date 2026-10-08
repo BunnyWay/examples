@@ -1,0 +1,19 @@
+---
+import { Image } from "astro:assets";
+import optimizer from "../assets/optimizer.png";
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Astro on Bunny Storage</title>
+  </head>
+  <body>
+    <h1>Astro on Bunny Storage</h1>
+    <p>A static Astro build served from Bunny Storage through Bunny CDN.</p>
+    <Image src={optimizer} alt="Bunny Optimizer illustration" layout="constrained" />
+    <Image src="/images/hero.png" alt="A bunny watching a machine turn HTML into Markdown" width={1737} height={893} layout="constrained" />
+  </body>
+</html>

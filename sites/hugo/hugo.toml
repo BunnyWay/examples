@@ -1,0 +1,4 @@
+baseURL = 'https://sites-example-hugo-alvpu3.b-cdn.net/'
+locale = 'en-us'
+title = 'Hugo on Bunny Storage'
+disableKinds = ['taxonomy', 'term']

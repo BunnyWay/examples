@@ -1,0 +1,13 @@
+AUTHOR = "bunny.net"
+SITENAME = "Pelican on Bunny Storage"
+SITEURL = ""
+
+PATH = "content"
+TIMEZONE = "UTC"
+DEFAULT_LANG = "en"
+
+FEED_ALL_ATOM = None
+CATEGORY_FEED_ATOM = None
+TRANSLATION_FEED_ATOM = None
+AUTHOR_FEED_ATOM = None
+AUTHOR_FEED_RSS = None

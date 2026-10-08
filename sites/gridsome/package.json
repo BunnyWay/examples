@@ -1,0 +1,14 @@
+{
+  "name": "sites-gridsome",
+  "private": true,
+  "scripts": {
+    "develop": "gridsome develop",
+    "build": "gridsome build"
+  },
+  "dependencies": {
+    "gridsome": "^0.7.23"
+  },
+  "overrides": {
+    "sharp": "^0.32.6"
+  }
+}

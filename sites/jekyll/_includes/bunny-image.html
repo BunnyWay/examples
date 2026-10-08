@@ -1,0 +1,7 @@
+{%- comment -%} A plain <img> by default. With bunny_optimizer: true in _config.yml, each srcset width is a Bunny Optimizer URL. {%- endcomment -%}
+{%- assign src = include.src | relative_url -%}
+{%- if site.bunny_optimizer -%}
+<img src="{{ src }}?width=1280&quality=75" srcset="{{ src }}?width=640&quality=75 640w, {{ src }}?width=960&quality=75 960w, {{ src }}?width=1280&quality=75 1280w, {{ src }}?width=1920&quality=75 1920w" sizes="{{ include.sizes | default: '100vw' }}" alt="{{ include.alt }}" width="{{ include.width }}" height="{{ include.height }}">
+{%- else -%}
+<img src="{{ src }}" alt="{{ include.alt }}" width="{{ include.width }}" height="{{ include.height }}">
+{%- endif -%}

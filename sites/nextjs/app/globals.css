@@ -1,0 +1,11 @@
+body {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: system-ui, sans-serif;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
