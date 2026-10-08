@@ -1,0 +1,13 @@
+title: Jekyll on Bunny Storage
+description: A Jekyll site served from Bunny Storage through Bunny CDN.
+baseurl: ""
+url: ""
+
+theme: minima
+plugins:
+  - jekyll-feed
+exclude:
+  - README.md
+
+# Set to true to serve images through Bunny Optimizer. See README.md.
+bunny_optimizer: false

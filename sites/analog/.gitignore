@@ -1,0 +1,8 @@
+/dist
+/out-tsc
+/node_modules
+/.angular/cache
+/.nx
+.DS_Store
+.env*
+.bunny

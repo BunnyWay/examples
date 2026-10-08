@@ -1,0 +1,9 @@
+# https://hexo.io/docs/configuration
+title: Hexo on Bunny Storage
+author: bunny.net
+language: en
+
+# Set to the URL your site is served from.
+url: https://sites-example-hexo-141a29.b-cdn.net
+
+theme: landscape

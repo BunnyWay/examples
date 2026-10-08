@@ -1,0 +1,4 @@
+site_name: MkDocs on Bunny Storage
+nav:
+  - Home: index.md
+  - About: about.md

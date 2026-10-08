@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "preact",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--openssl-legacy-provider preact watch",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider preact build --no-sw"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "preact-cli": "^3.5.1"
+  },
+  "dependencies": {
+    "preact": "^11.0.0",
+    "preact-render-to-string": "^6.8.0",
+    "preact-router": "^4.1.2"
+  }
+}

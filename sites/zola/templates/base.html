@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ config.title }}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ get_url(path='style.css', cachebust=true) }}" />
+  </head>
+  <body>
+    <nav>
+      <a href="{{ get_url(path='@/_index.md') }}">Home</a>
+      <a href="{{ get_url(path='@/about.md') }}">About</a>
+    </nav>
+    <main>{% block content %}{% endblock %}</main>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "sites": {
+    "build": "npm run docs:build",
+    "dir": "docs/.vitepress/dist"
+  }
+}
