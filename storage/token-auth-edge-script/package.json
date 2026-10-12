@@ -1,0 +1,18 @@
+{
+  "name": "storage-token-auth-edge-script",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "deno run --watch --allow-net --allow-env --env-file src/main.ts",
+    "test": "deno test src",
+    "build": "deno bundle --platform browser --output dist/main.js src/main.ts",
+    "deploy": "deno task build && bunny scripts deploy dist/main.js",
+    "check": "deno check src && deno lint src && deno fmt --check src"
+  },
+  "dependencies": {
+    "@bunny.net/edgescript-sdk": "^0.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0"
+  }
+}
