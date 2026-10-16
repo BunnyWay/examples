@@ -14,6 +14,9 @@ uv run --env-file .env manage.py runserver
 
 Open http://localhost:8000 and choose a video. `uv run` installs Django on the first run, and `--env-file` loads the two values when the server starts, so restart it after you change `.env`.
 
+> [!WARNING]
+> This example is for demo purposes. The upload routes are public, so anyone who can reach them can create videos in your library and upload to them. Before you deploy, put the routes behind your own user auth, and check that the signed-in user owns a video before re-signing it or returning its status.
+
 ## How it works
 
 1. The server creates a video through the Bunny Stream API and signs the upload.
@@ -28,8 +31,6 @@ If you reload mid-upload and pick the same file again, the server re-signs the s
 - [`uploads/views.py`](uploads/views.py): Creates and signs a video, or re-signs an unfinished one, and returns a video's status and embed URL.
 - [`uploads/static/uploads/video-uploader.js`](uploads/static/uploads/video-uploader.js): The tus-js-client upload.
 - [`uploads/static/uploads/uploaded-video.js`](uploads/static/uploads/uploaded-video.js): Polls the status and renders the player.
-
-The upload routes have no auth check. Put them behind your own sign-in before you deploy.
 
 ## Docs
 

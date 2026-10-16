@@ -12,6 +12,9 @@ composer run dev
 
 Set `BUNNY_STREAM_LIBRARY_ID` and `BUNNY_STREAM_API_KEY` from your library's **API** page, then open http://localhost:8000 and choose a video. `composer run dev` starts the PHP server and Vite together. No database is needed.
 
+> [!WARNING]
+> This example is for demo purposes. The upload routes are public, so anyone who can reach them can create videos in your library and upload to them. Before you deploy, put the routes behind your own user auth, and check that the signed-in user owns a video before re-signing it or returning its status.
+
 ## How it works
 
 1. The server creates a video through the Bunny Stream API and signs the upload.
@@ -28,8 +31,6 @@ If you reload mid-upload and pick the same file again, the server re-signs the s
 - [`app/Http/Controllers/VideoController.php`](app/Http/Controllers/VideoController.php): Returns a video's status and embed URL.
 - [`resources/js/video-uploader.js`](resources/js/video-uploader.js): The tus-js-client upload.
 - [`resources/js/uploaded-video.js`](resources/js/uploaded-video.js): Polls the status and renders the player.
-
-The upload routes have no auth check. Put them behind your own sign-in before you deploy.
 
 ## Docs
 

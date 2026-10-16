@@ -10,6 +10,9 @@ bun dev
 
 Set `BUNNY_STORAGE_ZONE`, `BUNNY_STORAGE_PASSWORD`, and `BUNNY_STORAGE_REGION` from the storage zone's **Access** tab, then open http://localhost:3000 and choose a file.
 
+> [!WARNING]
+> This example is for demo purposes. The upload route is public, so anyone who can reach it can upload files to your storage zone. Before you deploy, put it behind your own user auth.
+
 ## Where the code lives
 
 - [`lib/storage.ts`](lib/storage.ts): The S3 client, pointed at your zone.
@@ -20,8 +23,6 @@ Set `BUNNY_STORAGE_ZONE`, `BUNNY_STORAGE_PASSWORD`, and `BUNNY_STORAGE_REGION` f
 The client sets `requestChecksumCalculation: "WHEN_REQUIRED"`, otherwise the AWS SDK expects the browser to send a checksum with the presigned upload.
 
 For larger files, see the [Uppy multipart example](../s3-uppy-multipart-react).
-
-The upload route has no auth check. Put it behind your own sign-in before you deploy.
 
 ## Docs
 

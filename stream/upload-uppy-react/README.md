@@ -10,6 +10,9 @@ bun dev
 
 Set `BUNNY_STREAM_LIBRARY_ID` and `BUNNY_STREAM_API_KEY` from your library's **API** page, then open http://localhost:3000 and drop in a few videos.
 
+> [!WARNING]
+> This example is for demo purposes. The upload routes are public, so anyone who can reach them can create videos in your library and upload to them. Before you deploy, put the routes behind your own user auth, and check that the signed-in user owns a video before re-signing it or returning its status.
+
 ## How it works
 
 Each file needs its own signature, so [`src/App.tsx`](src/App.tsx) adds an Uppy preprocessor that calls `/api/uploads` for every file before the upload starts. The TUS plugin then sends each file's credentials through its `headers` option. Once a file finishes, the page polls its status and shows Bunny Player when encoding is done.
@@ -19,8 +22,6 @@ Each file needs its own signature, so [`src/App.tsx`](src/App.tsx) adds an Uppy 
 - [`src/index.ts`](src/index.ts): The `Bun.serve` routes for creating, signing, and checking videos.
 - [`src/App.tsx`](src/App.tsx): Uppy, the preprocessor, and the TUS plugin options.
 - [`src/uploaded-video.tsx`](src/uploaded-video.tsx): Polls the status and renders the player.
-
-The upload routes have no auth check. Put them behind your own sign-in before you deploy.
 
 ## Docs
 

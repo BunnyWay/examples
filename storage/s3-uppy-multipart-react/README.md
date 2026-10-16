@@ -10,13 +10,14 @@ bun dev
 
 Set `BUNNY_STORAGE_ZONE`, `BUNNY_STORAGE_PASSWORD`, and `BUNNY_STORAGE_REGION` from the storage zone's **Access** tab, then open http://localhost:3000 and drop in a large file.
 
+> [!WARNING]
+> This example is for demo purposes. The signing route is public, so anyone who can reach it can upload files to your storage zone. Before you deploy, put it behind your own user auth.
+
 ## How it works
 
 Uppy calls `signRequest` before every S3 request it makes. [`src/App.tsx`](src/App.tsx) forwards each one to `/api/sign`, and [`src/index.ts`](src/index.ts) presigns it with the AWS SDK. The server also picks the object key, so uploads always land under `uploads/`.
 
 The S3 client sets `requestChecksumCalculation: "WHEN_REQUIRED"`, otherwise the AWS SDK expects the browser to send a checksum with each presigned request.
-
-The signing route has no auth check. Put it behind your own sign-in before you deploy.
 
 ## Docs
 
