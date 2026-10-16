@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-The server listens on `http://127.0.0.1:8080/mcp`.
+The server answers MCP requests at `http://127.0.0.1:8080`, and at `/mcp` for clients that expect that path.
 
 ## Deploy
 
@@ -42,7 +42,7 @@ Use your API key from **Account settings** → **API Keys** in the [dashboard](h
 Claude Code:
 
 ```bash
-claude mcp add --transport http bunny-scripts https://your-script.b-cdn.net/mcp \
+claude mcp add --transport http bunny-scripts https://your-script.b-cdn.net \
   --header "Authorization: Bearer $BUNNY_API_KEY"
 ```
 
@@ -52,7 +52,7 @@ Any client that takes a JSON config:
 {
   "mcpServers": {
     "bunny-scripts": {
-      "url": "https://your-script.b-cdn.net/mcp",
+      "url": "https://your-script.b-cdn.net",
       "headers": { "Authorization": "Bearer YOUR_API_KEY" }
     }
   }
@@ -62,7 +62,7 @@ Any client that takes a JSON config:
 You can also call it with curl. `AccessKey: <key>` works as well as the `Authorization` header:
 
 ```bash
-curl https://your-script.b-cdn.net/mcp \
+curl https://your-script.b-cdn.net \
   -H "AccessKey: $BUNNY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
@@ -74,23 +74,21 @@ curl https://your-script.b-cdn.net/mcp \
 | Tool | What it does |
 | --- | --- |
 | `list_scripts` | List scripts, with an optional name search |
-| `get_script` | Get a script's details, linked pull zones, and variables |
-| `create_script` | Create a standalone or middleware script, with a pull zone by default |
-| `update_script` | Rename a script or change its type |
-| `delete_script` | Delete a script, and optionally its linked pull zones |
-| `get_script_code` | Read the saved code |
-| `set_script_code` | Save new code |
-| `publish_script` | Publish the saved code as a new release |
-| `list_releases` | List published releases |
+| `get_script` | Get a script's details, saved code, variables, secret names, and last five releases in one call |
 | `get_statistics` | Requests and CPU time over a date range |
-| `set_variable` / `delete_variable` | Manage environment variables |
-| `list_secrets` / `set_secret` / `delete_secret` | Manage secrets |
+| `create_script` | Create a standalone or middleware script, with a pull zone by default, and optionally publish its code |
+| `update_script` | Rename a script, change its type, save new code, and publish, in any combination |
+| `set_env` | Set an environment variable, or a secret with `secret: true` |
+| `delete_env` | Delete a variable or secret by name |
+| `delete_script` | Delete a script, and optionally its linked pull zones |
 
-Saving code and publishing it are separate steps, the same as the dashboard editor, so a client can show you the code before it goes live. Tools that only read are marked `readOnlyHint`, and the deletes are marked `destructiveHint`, so clients can ask before running them.
+The tools follow tasks rather than API endpoints, so a client deploys new code with one `update_script` call instead of chaining several. Code is saved without publishing unless the call sets `publish: true`, the same as the dashboard editor's **Save** and **Publish**. Read-only tools are marked `readOnlyHint` and the deletes `destructiveHint`, so clients can ask before running them.
+
+Responses never include a script's deployment key, since it can publish code to the script without an API key.
 
 ## How it works
 
-The server uses v2 of the [MCP TypeScript SDK](https://ts.sdk.modelcontextprotocol.io/v2/), from `@modelcontextprotocol/server`. [`src/main.ts`](src/main.ts) reads the key from `Authorization: Bearer <key>` (or `AccessKey`) and returns `401` if there isn't one. Otherwise it hands the request to `createMcpHandler` with the key as `authInfo`:
+The server uses v2 of the [MCP TypeScript SDK](https://ts.sdk.modelcontextprotocol.io/v2/), from `@modelcontextprotocol/server`. [`src/main.ts`](src/main.ts) serves MCP at `/` and `/mcp`. It reads the key from `Authorization: Bearer <key>` (or `AccessKey`) and returns `401` if there isn't one. Otherwise it hands the request to `createMcpHandler` with the key as `authInfo`:
 
 ```ts
 const mcp = createMcpHandler(({ authInfo }) => {
@@ -104,6 +102,8 @@ return mcp.fetch(request, { authInfo });
 `createMcpHandler` calls the factory once per request, so each request gets a fresh `McpServer` bound to its caller's key, and nothing is kept in memory between requests. It serves clients on the [2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) protocol revision and falls back to stateless Streamable HTTP for clients on the 2025 revisions.
 
 [`src/tools.ts`](src/tools.ts) registers each tool with a Zod 4 input schema and calls the Edge Scripting API through [`@bunny.net/openapi-client`](https://www.npmjs.com/package/@bunny.net/openapi-client). Its compute client is typed from bunny.net's OpenAPI spec, so paths, parameters, and request bodies are checked at compile time, and it sends the caller's key as `AccessKey`. If bunny.net rejects a call, the client throws an `ApiError` with the API's message, and the tool returns that message as an error result so the model can see why the call failed.
+
+The endpoint follows the [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/streamable-http). It only accepts POST, so GET and DELETE get a `405`. A request with an `Origin` header from any hostname other than the script's own gets a `403`, which stops web pages on other sites, and DNS rebinding attacks, from reaching it. MCP clients that aren't browsers don't send `Origin`, so they're unaffected. When a client disconnects, the server cancels any bunny.net calls still in flight for that request.
 
 `npm run typecheck` checks the code against the strict options in [`tsconfig.json`](tsconfig.json).
 
