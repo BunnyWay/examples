@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "node --watch src/main.ts",
-    "build": "esbuild src/main.ts --bundle --format=esm --platform=node --conditions=deno --outfile=dist/main.js --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
+    "build": "esbuild src/main.ts --bundle --format=esm --platform=node --conditions=deno --alias:debug=debug/src/browser.js --outfile=dist/main.js --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
     "deploy": "npm run build && bunny scripts deploy dist/main.js",
     "typecheck": "tsc --noEmit"
   },

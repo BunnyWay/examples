@@ -74,15 +74,23 @@ curl https://your-script.b-cdn.net \
 | Tool | What it does |
 | --- | --- |
 | `list_scripts` | List scripts, with an optional name search |
-| `get_script` | Get a script's details, saved code, variables, secret names, and last five releases in one call |
+| `get_script` | Get a script's details, saved code, variables, secret names, and last five releases in one call, plus any env names the code reads that have no value |
 | `get_statistics` | Requests and CPU time over a date range |
-| `create_script` | Create a standalone or middleware script, with a pull zone by default, and optionally publish its code |
-| `update_script` | Rename a script, change its type, save new code, and publish, in any combination |
+| `create_script` | Create a standalone or middleware script, with a pull zone by default, set its variables and secrets, and optionally publish its code |
+| `update_script` | Rename a script, change its type, save new code, set variables and secrets, and publish, in any combination |
 | `set_env` | Set an environment variable, or a secret with `secret: true` |
 | `delete_env` | Delete a variable or secret by name |
 | `delete_script` | Delete a script, and optionally its linked pull zones |
 
 The tools follow tasks rather than API endpoints, so a client deploys new code with one `update_script` call instead of chaining several. Code is saved without publishing unless the call sets `publish: true`, the same as the dashboard editor's **Save** and **Publish**. Read-only tools are marked `readOnlyHint` and the deletes `destructiveHint`, so clients can ask before running them.
+
+### Environment variables
+
+`create_script` and `update_script` take `variables` and `secrets` as maps of names to values, and set them before publishing, so the first release goes live with its environment in place. Before publishing, the server looks for the env names the code reads, from `process.env.NAME`, `process.env["NAME"]`, and `Deno.env.get("NAME")`. If any of them has no variable or secret, the code is saved but not published, and the result lists the names under `missingEnv`. The model then asks you for the values and calls `update_script` again with `publish: true`.
+
+Names that bundled libraries read for themselves, such as `NODE_ENV` and `DEBUG`, are skipped. Pass `ignoreEnv` for any others the code doesn't need. A lookup with a computed name, like `process.env[key]`, can't be found by reading the code, so it never blocks a publish.
+
+The server doesn't use MCP elicitation to ask for the values. Secrets are exactly the kind of sensitive input the spec says not to collect through elicitation forms, and clients on the 2025 protocol revisions can't receive elicitation requests from a stateless server.
 
 Responses never include a script's deployment key, since it can publish code to the script without an API key.
 

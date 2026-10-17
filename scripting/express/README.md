@@ -44,7 +44,7 @@ Two more pieces make Express work on top of it:
 - Express swaps the prototype of every `req` and `res` for its own, which extend `node:http`. `src/main.ts` points those prototypes at the fetch-to-node classes once at startup, so `res.json()` and friends write to a response that can be turned back into a `Response`.
 - There's no TCP socket at the edge. `express.json()` treats a request without a readable socket as already finished and skips the body, so `EdgeIncomingMessage` hands it a stand-in socket.
 
-The build leaves the `node:` built-ins Express needs as imports for the runtime to provide. The bundle is about 1.2 MB, well under the 10 MB script limit.
+The build leaves the `node:` built-ins Express needs as imports for the runtime to provide. The runtime doesn't allow `node:tty`, which the Node build of the `debug` package requires, so the build aliases `debug` to its browser build. The bundle is about 1.2 MB, well under the 10 MB script limit.
 
 `npm run typecheck` checks the code against the strict options in [`tsconfig.json`](tsconfig.json).
 

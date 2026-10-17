@@ -4,6 +4,7 @@ import type {
   components,
   createComputeClient,
 } from "@bunny.net/openapi-client/compute";
+import { missingEnv } from "./env.ts";
 
 type ComputeClient = ReturnType<typeof createComputeClient>;
 type EdgeScript = components["schemas"]["EdgeScriptModel"];
@@ -16,6 +17,26 @@ const scriptType = z
   .describe(
     "standalone answers requests itself, middleware sits in front of a pull zone origin",
   );
+const envInputs = {
+  variables: z
+    .record(z.string().min(1).max(256), z.string())
+    .optional()
+    .describe("Environment variables to set before publishing, by name"),
+  secrets: z
+    .record(z.string().min(1).max(256), z.string())
+    .optional()
+    .describe(
+      "Secrets to set before publishing, by name. They're stored encrypted and can't be read back.",
+    ),
+  ignoreEnv: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Env names the code reads that don't need a value, such as ones a bundled library checks. Only pass names the user has confirmed.",
+    ),
+};
+
+type EnvValues = Record<string, string> | undefined;
 
 // The deployment key can publish code to the script, so it never goes to the model.
 function withoutDeploymentKey(
@@ -61,6 +82,38 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
     });
   }
 
+  async function setEnv(
+    id: number,
+    variables: EnvValues,
+    secrets: EnvValues,
+  ): Promise<void> {
+    for (const [name, value] of Object.entries(variables ?? {})) {
+      await bunny.PUT("/compute/script/{id}/variables", {
+        params: { path: { id } },
+        body: { Name: name, DefaultValue: value },
+      });
+    }
+    for (const [name, value] of Object.entries(secrets ?? {})) {
+      await bunny.PUT("/compute/script/{id}/secrets", {
+        params: { path: { id } },
+        body: { Name: name, Secret: value },
+      });
+    }
+  }
+
+  async function envNamesOn(id: number): Promise<string[]> {
+    const path = { params: { path: { id } } };
+    const [script, secrets] = await Promise.all([
+      bunny.GET("/compute/script/{id}", path),
+      bunny.GET("/compute/script/{id}/secrets", path),
+    ]);
+
+    return [
+      ...(script.data?.EdgeScriptVariables ?? []),
+      ...(secrets.data?.Secrets ?? []),
+    ].flatMap((entry) => (entry.Name ? [entry.Name] : []));
+  }
+
   server.registerTool(
     "list_scripts",
     {
@@ -91,7 +144,7 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
     "get_script",
     {
       description:
-        "Get everything about an Edge Script: its details, hostnames, linked pull zones, saved code, environment variables, secret names, and recent releases",
+        "Get everything about an Edge Script: its details, hostnames, linked pull zones, saved code, environment variables, secret names, and recent releases. MissingEnv lists env names the code reads that have no variable or secret.",
       inputSchema: z.object({ id: scriptId }),
       annotations: { readOnlyHint: true },
     },
@@ -107,10 +160,16 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
           }),
         ]);
 
+        const envNames = [
+          ...(script.data?.EdgeScriptVariables ?? []),
+          ...(secrets.data?.Secrets ?? []),
+        ].flatMap((entry) => (entry.Name ? [entry.Name] : []));
+
         return {
           ...withoutDeploymentKey(script.data),
           Code: code.data?.Code,
           SecretNames: secrets.data?.Secrets?.map((secret) => secret.Name),
+          MissingEnv: missingEnv(code.data?.Code ?? "", envNames),
           RecentReleases: releases.data?.Items?.map(
             ({ Code: _, ...release }) => release,
           ),
@@ -150,7 +209,7 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
     "create_script",
     {
       description:
-        "Create an Edge Script. By default a pull zone is created with it so the script gets a public URL. The code is saved but not live until it's published.",
+        "Create an Edge Script. By default a pull zone is created with it so the script gets a public URL. The code is saved but not live until it's published. Pass the env values the code reads as variables or secrets. If any are missing, the script is created but not published, and missingEnv lists them so you can ask the user for values.",
       inputSchema: z.object({
         name: z.string().max(100),
         type: scriptType.default("standalone"),
@@ -164,6 +223,7 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
           .describe("Publish the code as the first release"),
         createLinkedPullZone: z.boolean().default(true),
         linkedPullZoneName: z.string().optional(),
+        ...envInputs,
       }),
     },
     ({
@@ -173,6 +233,9 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
       publish: shouldPublish,
       createLinkedPullZone,
       linkedPullZoneName,
+      variables,
+      secrets,
+      ignoreEnv,
     }) =>
       call(async () => {
         const { data } = await bunny.POST("/compute/script", {
@@ -185,11 +248,31 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
           },
         });
 
-        if (shouldPublish && data?.Id !== undefined) {
-          await publish(data.Id, undefined);
+        const id = data?.Id;
+        if (id === undefined) {
+          throw new Error("bunny.net didn't return an ID for the new script");
         }
 
-        return { ...withoutDeploymentKey(data), Published: shouldPublish };
+        await setEnv(id, variables, secrets);
+
+        const missing = missingEnv(
+          code ?? "",
+          [...Object.keys(variables ?? {}), ...Object.keys(secrets ?? {})],
+          ignoreEnv,
+        );
+        const published = shouldPublish && missing.length === 0;
+        if (published) {
+          await publish(id, undefined);
+        }
+
+        return {
+          ...withoutDeploymentKey(data),
+          published,
+          ...(missing.length > 0 && {
+            missingEnv: missing,
+            next: "The code reads these env names, but no value was given. Ask the user for each value and whether it's a secret, then call update_script with variables or secrets and publish: true.",
+          }),
+        };
       }),
   );
 
@@ -197,7 +280,7 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
     "update_script",
     {
       description:
-        "Update an Edge Script: rename it, change its type, save new code, and publish. Saved code isn't live until it's published. Set only publish to republish the code that's already saved.",
+        "Update an Edge Script: rename it, change its type, save new code, set env values, and publish. Saved code isn't live until it's published. Set only publish to republish the code that's already saved. Publishing is skipped while the code reads env names that have no value, and missingEnv lists them.",
       inputSchema: z.object({
         id: scriptId,
         name: z.string().max(100).optional(),
@@ -208,9 +291,20 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
           .default(false)
           .describe("Publish the saved code as a new release"),
         note: z.string().optional().describe("A note for the release"),
+        ...envInputs,
       }),
     },
-    ({ id, name, type, code, publish: shouldPublish, note }) =>
+    ({
+      id,
+      name,
+      type,
+      code,
+      publish: shouldPublish,
+      note,
+      variables,
+      secrets,
+      ignoreEnv,
+    }) =>
       call(async () => {
         const changed: string[] = [];
 
@@ -233,18 +327,44 @@ export function createMcpServer(bunny: ComputeClient): McpServer {
           changed.push("code");
         }
 
-        if (shouldPublish) {
-          await publish(id, note);
-          changed.push("published");
+        await setEnv(id, variables, secrets);
+        if (variables || secrets) {
+          changed.push("env");
         }
 
-        if (changed.length === 0) {
-          throw new Error(
-            "Nothing to update. Pass name, type, code, or publish.",
-          );
+        if (!shouldPublish) {
+          if (changed.length === 0) {
+            throw new Error(
+              "Nothing to update. Pass name, type, code, variables, secrets, or publish.",
+            );
+          }
+
+          return { id, changed, published: false };
         }
 
-        return { id, changed };
+        const savedCode =
+          code ??
+          (
+            await bunny.GET("/compute/script/{id}/code", {
+              params: { path: { id } },
+            })
+          ).data?.Code ??
+          "";
+        const missing = missingEnv(savedCode, await envNamesOn(id), ignoreEnv);
+        if (missing.length > 0) {
+          return {
+            id,
+            changed,
+            published: false,
+            missingEnv: missing,
+            next: "The code reads these env names, but the script has no value for them. Ask the user for each value and whether it's a secret, then call update_script again with variables or secrets and publish: true.",
+          };
+        }
+
+        await publish(id, note);
+        changed.push("published");
+
+        return { id, changed, published: true };
       }),
   );
 
