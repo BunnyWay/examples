@@ -1,0 +1,22 @@
+{
+  "name": "scripting-elysia",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "node --watch src/main.ts",
+    "build": "esbuild src/main.ts --bundle --format=esm --platform=browser --outfile=dist/main.js",
+    "deploy": "npm run build && bunny scripts deploy dist/main.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bunny.net/edgescript-sdk": "^0.13.0",
+    "elysia": "^1.4.30"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

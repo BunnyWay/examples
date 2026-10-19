@@ -7,6 +7,7 @@ const MAX_BYTES = 100 * 1024 * 1024;
 
 // Returns a URL the browser can PUT one file to for the next ten minutes.
 export async function POST(request: Request) {
+  // Require a signed-in user here. This route is public, and it lets anyone upload to your storage zone.
   const { filename, contentType, size } = (await request.json()) as {
     filename?: unknown;
     contentType?: unknown;

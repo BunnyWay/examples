@@ -1,0 +1,25 @@
+{
+  "name": "scripting-express",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "node --watch src/main.ts",
+    "build": "esbuild src/main.ts --bundle --format=esm --platform=node --conditions=deno --alias:debug=debug/src/browser.js --outfile=dist/main.js --banner:js=\"import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);\"",
+    "deploy": "npm run build && bunny scripts deploy dist/main.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bunny.net/edgescript-sdk": "^0.13.0",
+    "express": "^5.3.0",
+    "fetch-to-node": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

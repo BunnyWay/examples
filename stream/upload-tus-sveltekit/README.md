@@ -10,6 +10,9 @@ bun dev
 
 Set `BUNNY_STREAM_LIBRARY_ID` and `BUNNY_STREAM_API_KEY` from your library's **API** page, then open http://localhost:5173 and choose a video.
 
+> [!WARNING]
+> This example is for demo purposes. The upload routes are public, so anyone who can reach them can create videos in your library and upload to them. Before you deploy, put the routes behind your own user auth, and check that the signed-in user owns a video before re-signing it or returning its status.
+
 ## How it works
 
 1. The server creates a video through the Bunny Stream API and signs the upload.
@@ -25,8 +28,6 @@ If you reload mid-upload and pick the same file again, the server re-signs the s
 - [`src/routes/api/videos/[id]/+server.ts`](src/routes/api/videos/[id]/+server.ts): Returns a video's status and embed URL.
 - [`src/lib/components/VideoUploader.svelte`](src/lib/components/VideoUploader.svelte): The tus-js-client upload.
 - [`src/lib/components/UploadedVideo.svelte`](src/lib/components/UploadedVideo.svelte): Polls the status and renders the player.
-
-The upload routes have no auth check. Put them behind your own sign-in before you deploy.
 
 Before you deploy, swap `@sveltejs/adapter-auto` in [`vite.config.ts`](vite.config.ts) for the [adapter](https://svelte.dev/docs/kit/adapters) that matches your host, and set the variables in its environment. The production server doesn't read `.env`.
 
