@@ -1,0 +1,42 @@
+{
+  "version": "5",
+  "specifiers": {
+    "npm:@bunny.net/edgescript-sdk@0.13": "0.13.0_hono@4.13.13",
+    "npm:@types/node@24": "24.13.3"
+  },
+  "npm": {
+    "@bunny.net/edgescript-sdk@0.13.0_hono@4.13.13": {
+      "integrity": "sha512-rxYkjhEg40t/NaDy65S3CRbUuCdlWwz5MakZrZrA3SACzJWLaXRUVEW3WdmQ8hzCLGTY/nmKzo3gWxQfzb+VXA==",
+      "dependencies": [
+        "@hono/node-server",
+        "hono"
+      ]
+    },
+    "@hono/node-server@1.19.17_hono@4.13.13": {
+      "integrity": "sha512-dSneS5qhiauZWGDCeK4o695Xd9nUNjviSZCMQrj10eetr8Uln1ucn6bbphOM6UynAMMtNIzZNSpL9vnASJwrPQ==",
+      "dependencies": [
+        "hono"
+      ]
+    },
+    "@types/node@24.13.3": {
+      "integrity": "sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
+    "hono@4.13.13": {
+      "integrity": "sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA=="
+    },
+    "undici-types@7.18.2": {
+      "integrity": "sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w=="
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@bunny.net/edgescript-sdk@0.13",
+        "npm:@types/node@24"
+      ]
+    }
+  }
+}
