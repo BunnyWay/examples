@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Deletes videos that break your rules before you pay to encode them. This one rejects anything over 20 minutes or under 480p.
+Deletes videos that break your rules before they take up storage. This one rejects anything over 20 minutes or under 480p.
 
 Handles status 2. Every other status gets a `200` and is ignored.
 

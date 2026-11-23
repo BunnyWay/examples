@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 async function postToSlack(text: string) {
@@ -27,19 +28,23 @@ async function handle(event: StreamEvent): Promise<Response> {
   //       and record this one.
   const failedBefore = false;
 
-  if (failedBefore) {
-    await postToSlack(`Encoding failed twice for ${event.VideoGuid}`);
+  if (!failedBefore) {
+    const res = await fetch(
+      `https://video.bunnycdn.com/library/${event.VideoLibraryId}/videos/${event.VideoGuid}/reencode`,
+      { method: "POST", headers: { AccessKey: process.env.STREAM_API_KEY! } },
+    );
+    if (res.ok) return new Response("Retrying");
+
+    // Failed URL fetches and rejected non-video files have no original, so the
+    // re-encode is refused and no second status 5 will arrive. Alert now instead.
+    await postToSlack(`Encoding failed for ${event.VideoGuid} and can't be retried (${res.status})`);
 
     return new Response("OK");
   }
 
-  const res = await fetch(
-    `https://video.bunnycdn.com/library/${event.VideoLibraryId}/videos/${event.VideoGuid}/reencode`,
-    { method: "POST", headers: { AccessKey: process.env.STREAM_API_KEY! } },
-  );
-  if (!res.ok) throw new Error(`Reencode failed with ${res.status}`);
+  await postToSlack(`Encoding failed twice for ${event.VideoGuid}`);
 
-  return new Response("Retrying");
+  return new Response("OK");
 }
 
 // Stream signs the raw body with HMAC-SHA256, using the library's read-only API key.

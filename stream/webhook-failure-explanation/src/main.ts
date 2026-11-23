@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -39,8 +40,11 @@ async function handle(event: StreamEvent): Promise<Response> {
     .map((m) => `- ${m.message}`)
     .join("\n");
 
-  // TODO: email the uploader with `problems` (Resend, Postmark).
-  console.log(`"${video.title}" failed:\n${problems}`);
+  // Failed URL fetches and some upload failures have no error-level message.
+  const reason = problems || "- The file couldn't be processed. Try uploading it again.";
+
+  // TODO: email the uploader with `reason` (Resend, Postmark).
+  console.log(`"${video.title}" failed:\n${reason}`);
 
   return new Response("OK");
 }

@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Keeps videos off your site until they play at every resolution. Status 3 is the green light.
+Keeps videos off your site until they play at every resolution. Status 3 is the green light. Status 3 can repeat after a re-encode or repackage, and for live stream recordings, so key on `VideoGuid` and upsert. Keep the first `publishedAt` rather than overwriting it.
 
 Handles status 3. Every other status gets a `200` and is ignored.
 

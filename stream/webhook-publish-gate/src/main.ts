@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -40,8 +41,9 @@ async function handle(event: StreamEvent): Promise<Response> {
     publishedAt: event.Timestamp,
   };
 
-  // TODO: upsert `published` into your database and mark the video as live,
-  //       e.g. with @libsql/client/web for Bunny Database.
+  // TODO: upsert `published` into your database keyed on `id`, and mark the video as live,
+  //       e.g. with @libsql/client/web for Bunny Database. Status 3 can repeat,
+  //       so keep the existing publishedAt when the row already exists.
   console.log("Published", published);
 
   return new Response("OK");

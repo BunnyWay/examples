@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {

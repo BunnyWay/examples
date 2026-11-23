@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Posts to Slack when a video finishes encoding. For Discord, send `content` where Slack expects `text`.
+Posts to Slack when a video finishes encoding. For Discord, send `content` where Slack expects `text`. Status 3 can repeat after a re-encode or repackage, and for live stream recordings, so key on `VideoGuid` and upsert. Keep an "announced" flag per video so it only posts once.
 
 Handles status 3. Every other status gets a `200` and is ignored.
 

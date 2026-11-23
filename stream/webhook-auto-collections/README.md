@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Moves each video into a collection named after its auto-detected `category`, creating the collection when it's missing. No database needed. Videos still marked `untagged` are skipped, so turn on content tagging with `bunny stream libraries update <library> --content-tagging`.
+Moves each video into a collection named after its auto-detected `category`, creating the collection when it's missing. No database needed. `category` is only filled when content tagging is on for the library (`bunny stream libraries update <library> --content-tagging`). Without it every video stays `untagged` permanently and is skipped. Collection names aren't unique, so two videos finishing at the same time with a new category can each create the collection.
 
 Handles status 3. Every other status gets a `200` and is ignored.
 

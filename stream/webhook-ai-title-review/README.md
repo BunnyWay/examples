@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Status 10 means Bunny Stream has written a `title` or `description`. This script sends the new copy to Slack so a person reads it before your site shows it.
+Status 10 means Bunny Stream has written a `title` or `description`. This script sends the new copy to Slack so a person reads it before your site shows it. With both title and description generation on, status 10 fires once for each, so the reviewer gets two messages and the first still shows the old description.
 
 Handles status 10. Every other status gets a `200` and is ignored.
 

@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -42,11 +43,17 @@ const WATCH_URL = "https://example.com/watch";
 async function handle(event: StreamEvent): Promise<Response> {
   if (event.Status !== 3) return new Response("Ignored");
 
+  // TODO: check an "announced" flag for event.VideoGuid in your database.
+  //       Status 3 repeats after a re-encode or for live recordings.
+  const announced = false;
+  if (announced) return new Response("Already announced");
+
   const video = await getVideo(event);
 
   await postToSlack(`New video: ${video.title} ${WATCH_URL}/${video.guid}`);
 
-  // TODO: email your subscribers too (Resend, Postmark, your newsletter tool).
+  // TODO: email your subscribers too (Resend, Postmark, your newsletter tool),
+  //       then set the "announced" flag.
 
   return new Response("OK");
 }

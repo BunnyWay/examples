@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Status 4 fires once per finished resolution, and the first one makes the video playable. Retries and resolutions that finish close together can all look like the first, so keep a flag per video and tell the uploader once.
+Status 4 fires once per finished resolution, and the first one makes the video playable. Retries and resolutions that finish close together can all look like the first, so keep a flag per video and tell the uploader once. The first event can also arrive just before the resolution is saved, leaving `availableResolutions` empty. The script answers with a `503` then, so Stream retries a little later.
 
 Handles status 4. Every other status gets a `200` and is ignored.
 

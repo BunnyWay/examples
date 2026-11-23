@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Someone uploaded the same file twice and you're paying to store both. `originalHash` catches it.
+Someone uploaded the same file twice and you're paying to store both. `originalHash` catches it. Status 3 can repeat after a re-encode or repackage, and for live stream recordings, so key on `VideoGuid` and upsert. A video matching its own saved hash is not a duplicate.
 
 Handles status 3. Every other status gets a `200` and is ignored.
 

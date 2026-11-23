@@ -2,7 +2,15 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-With pre-signed uploads the file goes from the browser straight to Bunny Stream, so your backend never sees it. Statuses 6, 7 and 8 tell you how the upload went.
+With pre-signed uploads the file goes from the browser straight to Bunny Stream, so your backend never sees it. Statuses 6, 7 and 8 tell you what happened once it arrived:
+
+| Status | Meaning |
+| --- | --- |
+| 6 | The server has received the whole TUS upload |
+| 7 | The file is in storage |
+| 8 | Copying the file to storage failed |
+
+Detect browser-side failures in your TUS client. Status 8 means our side failed and the file needs to be sent again.
 
 Handles status 6, 7 and 8. Every other status gets a `200` and is ignored.
 

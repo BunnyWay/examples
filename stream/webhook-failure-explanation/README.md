@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-"Encoding failed" is the "something went wrong" of video. Get Video's `transcodingMessages` say what actually broke, so pass them on.
+"Encoding failed" is the "something went wrong" of video. Get Video's `transcodingMessages` say what actually broke, so pass them on. Failed URL fetches and some upload failures have no error-level message, so the script falls back to a generic one.
 
 Handles status 5. Every other status gets a `200` and is ignored.
 

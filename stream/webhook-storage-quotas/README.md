@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-`storageSize` is the video's total footprint in bytes, across every resolution, thumbnail and the original. Add it up per user and you have the number a plan limit needs.
+`storageSize` is the video's footprint in bytes across every resolution and thumbnail. It includes the original only when **Keep Original Files** is on, and captions generated after status 3 aren't counted yet. Store it per video and sum per user, and you have the number a plan limit needs. Status 3 can repeat after a re-encode or repackage, and for live stream recordings, so key on `VideoGuid` and upsert. Set the video's size rather than adding to a running total, or a repeat double-counts.
 
 Handles status 3. Every other status gets a `200` and is ignored.
 

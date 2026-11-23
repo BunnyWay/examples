@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Status 11 means automatic captions failed. Status 33 means a smart feature failed, and its `Reason` names which one: `Title`, `Description`, `Chapters` or `Moments`. This script tells Slack what's missing so the watch page doesn't quietly ship without it. To try again, call [Transcribe](https://docs.bunny.net/api-reference/stream/manage-videos/transcribe-video) with `force=true`. Forcing bills transcription again, so keep it to one retry per video.
+Status 11 means automatic captions failed. Status 33 means a smart feature failed, and its `Reason` names which one: `Title`, `Description`, `Chapters` or `Moments`. This script tells Slack what's missing so the watch page doesn't quietly ship without it. After a status 11, call [Transcribe](https://docs.bunny.net/api-reference/stream/manage-videos/transcribe-video) again; it needs **Keep Original Files** switched on, and `force=true` only when an auto caption track already exists. After a status 33, call Trigger Smart Actions (`POST /library/{id}/videos/{guid}/smart`) with the feature that failed, which reuses the captions you already have.
 
 Handles status 11 and 33. Every other status gets a `200` and is ignored.
 

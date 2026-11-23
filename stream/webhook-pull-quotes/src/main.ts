@@ -8,7 +8,25 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
+
+type Video = {
+  guid: string;
+  captions: { srclang: string; version: number }[] | null;
+};
+
+async function getVideo(event: StreamEvent): Promise<Video> {
+  const res = await fetch(
+    `https://video.bunnycdn.com/library/${event.VideoLibraryId}/videos/${event.VideoGuid}`,
+    { headers: { AccessKey: process.env.STREAM_API_KEY! } },
+  );
+
+  // A 5xx tells Stream to retry the delivery later.
+  if (!res.ok) throw new Error(`Get Video failed with ${res.status}`);
+
+  return res.json();
+}
 
 const WATCH_URL = "https://example.com/watch";
 
@@ -19,9 +37,10 @@ function toSeconds(time: string) {
 }
 
 // Keeps each cue's start time so the model can point back into the video.
+// Cues can be separated by more than one blank line, so split on any run of them.
 function toTimedLines(vtt: string) {
-  return vtt.split("\n\n").flatMap((cue) => {
-    const [timing, ...text] = cue.split("\n").filter((l) => !/^\d+$/.test(l));
+  return vtt.split(/\n{2,}/).flatMap((cue) => {
+    const [timing, ...text] = cue.split("\n").filter((l) => l.trim() && !/^\d+$/.test(l));
     if (!timing?.includes("-->")) return [];
 
     const start = timing.split(" --> ")[0] ?? "0:0:0";
@@ -33,11 +52,18 @@ function toTimedLines(vtt: string) {
 async function handle(event: StreamEvent): Promise<Response> {
   if (event.Status !== 9) return new Response("Ignored");
 
-  // Assumes English captions. See webhook-searchable-transcripts for reading every track.
+  // Status 9 fires once per caption language, so this runs several times per video.
+  // TODO: check a "quotes done" flag for event.VideoGuid in your database and stop here if it's set.
+
+  // Auto-generated tracks are listed as "en-auto", uploaded ones as "en".
+  const video = await getVideo(event);
+  const caption = video.captions?.find((c) => c.srclang === "en" || c.srclang === "en-auto");
+  if (!caption) return new Response("No English captions yet");
+
   const res = await fetch(
-    `https://${process.env.STREAM_CDN_HOSTNAME}/${event.VideoGuid}/captions/en.vtt`,
+    `https://${process.env.STREAM_CDN_HOSTNAME}/${video.guid}/captions/${caption.srclang}.vtt?v=${caption.version}`,
   );
-  if (!res.ok) throw new Error(`Captions returned ${res.status}`);
+  if (!res.ok) throw new Error(`Caption ${caption.srclang} returned ${res.status}`);
 
   const lines = toTimedLines(await res.text());
 
@@ -51,6 +77,8 @@ async function handle(event: StreamEvent): Promise<Response> {
     // TODO: save as a draft post in your scheduler, or render a share card.
     console.log(`"${quote}" ${link}`);
   }
+
+  // TODO: set the "quotes done" flag for event.VideoGuid.
 
   return new Response("OK");
 }

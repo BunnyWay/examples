@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-When a video finishes encoding or is deleted, this script lists the library's playable videos and writes a [video sitemap](https://developers.google.com/search/docs/crawling-indexing/sitemaps/video-sitemaps) to Bunny Storage as `sitemap-videos.xml`. Serve the storage zone through a pull zone and point search engines at it. No database needed.
+When a video finishes encoding or is deleted, this script lists the library's playable videos and writes a [video sitemap](https://developers.google.com/search/docs/crawling-indexing/sitemaps/video-sitemaps) to Bunny Storage as `sitemap-videos.xml`. Serve the storage zone through a pull zone and point search engines at it. No database needed. Thumbnails come from List Videos' `thumbnailUrl`. With token authentication on, crawlers can't fetch them.
 
 Handles status 3 and 32. Every other status gets a `200` and is ignored.
 
@@ -15,7 +15,6 @@ Handles status 3 and 32. Every other status gets a `200` and is ignored.
 | --- | --- |
 | `STREAM_READ_ONLY_KEY` | The library's read-only API key, used to verify webhook signatures. `bunny stream libraries credentials <library> --read-only --show-secret` |
 | `STREAM_API_KEY` | The library's API key, used to list videos. `bunny stream libraries credentials <library> --show-secret` |
-| `STREAM_CDN_HOSTNAME` | The library's CDN hostname, like `vz-abc123.b-cdn.net`, used for thumbnail URLs |
 | `STORAGE_ZONE_NAME` | The storage zone the sitemap is written to |
 | `STORAGE_ZONE_PASSWORD` | The storage zone's password, from its **FTP & API Access** tab |
 | `STORAGE_HOSTNAME` | The storage zone's region endpoint, like `storage.bunnycdn.com` or `uk.storage.bunnycdn.com` |
@@ -27,7 +26,6 @@ npm install
 bunny scripts create stream-webhook-video-sitemap --type standalone
 bunny scripts env set STREAM_READ_ONLY_KEY <value> --secret
 bunny scripts env set STREAM_API_KEY <value> --secret
-bunny scripts env set STREAM_CDN_HOSTNAME <value>
 bunny scripts env set STORAGE_ZONE_NAME <value>
 bunny scripts env set STORAGE_ZONE_PASSWORD <value> --secret
 bunny scripts env set STORAGE_HOSTNAME <value>

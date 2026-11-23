@@ -8,12 +8,14 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
   width: number;
   height: number;
   length: number;
+  rotation: number | null;
 };
 
 async function getVideo(event: StreamEvent): Promise<Video> {
@@ -32,7 +34,10 @@ async function handle(event: StreamEvent): Promise<Response> {
   if (event.Status !== 3) return new Response("Ignored");
 
   const video = await getVideo(event);
-  const feed = video.height > video.width && video.length <= 60 ? "shorts" : "main";
+  // width and height are the stored, unrotated dimensions. Phone videos often report -90.
+  const sideways = Math.abs(video.rotation ?? 0) % 180 === 90;
+  const [width, height] = sideways ? [video.height, video.width] : [video.width, video.height];
+  const feed = height > width && video.length <= 60 ? "shorts" : "main";
 
   // TODO: save the feed against the video in your database.
   console.log(`${event.VideoGuid} goes in the ${feed} feed`);

@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -35,7 +36,8 @@ async function handle(event: StreamEvent): Promise<Response> {
 
   // TODO: look up video.originalHash in your database.
   //       Found on another video: flag or delete this one.
-  //       Not found: save the hash against video.guid.
+  //       Not found: upsert the hash against video.guid. Status 3 can repeat,
+  //       so a match on this same guid is not a duplicate.
   console.log(`${video.guid} has hash ${video.originalHash}`);
 
   return new Response("OK");

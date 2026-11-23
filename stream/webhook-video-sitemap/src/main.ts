@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -17,6 +18,7 @@ type Video = {
   length: number;
   dateUploaded: string;
   thumbnailFileName: string | null;
+  thumbnailUrl: string;
   availableResolutions: string | null;
 };
 
@@ -27,7 +29,7 @@ type VideoPage = {
 
 const WATCH_URL = "https://example.com/watch";
 const SITEMAP_PATH = "sitemap-videos.xml";
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 1000;
 
 async function listVideos(libraryId: number): Promise<Video[]> {
   const videos: Video[] = [];
@@ -62,7 +64,7 @@ function toSitemap(libraryId: number, videos: Video[]) {
     (video) => `  <url>
     <loc>${WATCH_URL}/${video.guid}</loc>
     <video:video>
-      <video:thumbnail_loc>https://${process.env.STREAM_CDN_HOSTNAME}/${video.guid}/${video.thumbnailFileName}</video:thumbnail_loc>
+      <video:thumbnail_loc>${escapeXml(video.thumbnailUrl)}</video:thumbnail_loc>
       <video:title>${escapeXml(video.title)}</video:title>
       <video:description>${escapeXml(video.description || video.title)}</video:description>
       <video:player_loc>https://player.mediadelivery.net/embed/${libraryId}/${video.guid}</video:player_loc>

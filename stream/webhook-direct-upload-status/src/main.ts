@@ -8,12 +8,15 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
+// These are server-side events. The browser starting, dropping or abandoning
+// an upload sends nothing, so catch those in your TUS client.
 const uploads: Record<number, string> = {
-  6: "uploading",
-  7: "uploaded",
-  8: "upload_failed",
+  6: "received",
+  7: "stored",
+  8: "processing_failed",
 };
 
 async function handle(event: StreamEvent): Promise<Response> {
@@ -21,7 +24,7 @@ async function handle(event: StreamEvent): Promise<Response> {
   if (!state) return new Response("Ignored");
 
   // TODO: update the upload's state in your database, keyed by event.VideoGuid.
-  //       On "upload_failed", show the user a retry button.
+  //       On "processing_failed", our side failed and the file needs to be sent again.
   console.log(`${event.VideoGuid}: ${state}`);
 
   return new Response("OK");

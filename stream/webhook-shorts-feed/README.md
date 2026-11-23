@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-Sends vertical videos under a minute to a shorts feed and everything else to your main feed. Get Video also returns a `rotation` from the file's metadata, and you may need to swap width and height when it reads 90 or 270.
+Sends vertical videos under a minute to a shorts feed and everything else to your main feed. Get Video's `width` and `height` are the stored, unrotated dimensions, and `rotation` can be 90, -90, 270 or -270. Phone videos commonly report -90, so the script swaps width and height when `Math.abs(rotation) % 180 === 90`.
 
 Handles status 3. Every other status gets a `200` and is ignored.
 

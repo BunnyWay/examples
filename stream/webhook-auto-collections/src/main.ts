@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -46,7 +47,7 @@ async function handle(event: StreamEvent): Promise<Response> {
 
   const video = await getVideo(event);
   const category = video.category;
-  if (!category || category === "untagged") return new Response("No category yet");
+  if (!category || category === "untagged") return new Response("No category");
 
   const library = `/library/${event.VideoLibraryId}`;
 

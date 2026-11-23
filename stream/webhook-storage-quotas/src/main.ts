@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -33,8 +34,9 @@ async function handle(event: StreamEvent): Promise<Response> {
   const video = await getVideo(event);
   const megabytes = Math.round(video.storageSize / 1024 / 1024);
 
-  // TODO: add video.storageSize to the uploader's usage in your database,
-  //       and warn or block them when they pass their plan's limit.
+  // TODO: upsert video.storageSize against video.guid in your database (set, don't add,
+  //       since status 3 can repeat), sum it per uploader, and warn or block them
+  //       when they pass their plan's limit.
   console.log(`${video.guid} uses ${megabytes} MB`);
 
   return new Response("OK");

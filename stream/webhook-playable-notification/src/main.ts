@@ -8,6 +8,7 @@ type StreamEvent = {
   EventId: string;
   Timestamp: string;
   Reason?: string;
+  IsLiveStreamWebhook?: boolean;
 };
 
 type Video = {
@@ -30,13 +31,18 @@ async function getVideo(event: StreamEvent): Promise<Video> {
 async function handle(event: StreamEvent): Promise<Response> {
   if (event.Status !== 4) return new Response("Ignored");
 
-  // TODO: check an "announced" flag for event.VideoGuid in your database
-  //       and set it now. Retries and later resolutions then stop here.
+  // TODO: check an "announced" flag for event.VideoGuid in your database.
+  //       Retries and later resolutions then stop here.
   const announced = false;
   if (announced) return new Response("Already announced");
 
   const video = await getVideo(event);
   const resolutions = (video.availableResolutions ?? "").split(",").filter(Boolean);
+
+  // The webhook can arrive just before the resolution is saved. A 5xx makes Stream retry shortly.
+  if (!resolutions[0]) return new Response("No resolution saved yet", { status: 503 });
+
+  // TODO: set the "announced" flag for event.VideoGuid.
 
   // TODO: look up the uploader in your database and email them
   //       (Resend, Postmark or your own provider).

@@ -2,7 +2,7 @@
 
 A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running as a standalone Edge Script.
 
-When captions are ready, each track is a WebVTT file at `/{video_id}/captions/{language}.vtt` on the library's CDN hostname. Strip the timestamps and you have a transcript you can search. The `?v=` uses the caption's `version`, so you never read a stale copy from cache. If the library uses token authentication, sign the caption URL before fetching it.
+When captions are ready, each track is a WebVTT file at `/{video_id}/captions/{language}.vtt` on the library's CDN hostname. Strip the timestamps and you have a transcript you can search. The `?v=` uses the caption's `version`, so you never read a stale copy from cache. If the library uses token authentication, sign the caption URL before fetching it. Status 9 fires once per language, and each event re-reads every track, so upsert by video and language.
 
 Handles status 9. Every other status gets a `200` and is ignored.
 

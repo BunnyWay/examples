@@ -50,7 +50,7 @@ With [token authentication](https://docs.bunny.net/stream/token-authentication) 
 
 ## Webhooks
 
-Each folder is a standalone [Edge Script](https://docs.bunny.net/scripting) that handles [Bunny Stream webhooks](https://docs.bunny.net/stream/webhooks). They all verify the webhook signature with the library's read-only API key, then act on one or more statuses. Each one deploys with `npm run deploy` after `bunny scripts create`, and its README lists the env vars it needs.
+Each folder is a standalone [Edge Script](https://docs.bunny.net/scripting) that handles [Bunny Stream webhooks](https://docs.bunny.net/stream/webhooks). They all verify the webhook signature with the library's read-only API key, then act on one or more video statuses. Live stream statuses (14 to 31) arrive on the same URL with `IsLiveStreamWebhook: true`, and these scripts ignore them. Each one deploys with `npm run deploy` after `bunny scripts create`, and its README lists the env vars it needs.
 
 | Example | What it does |
 | --- | --- |
@@ -70,7 +70,7 @@ Each folder is a standalone [Edge Script](https://docs.bunny.net/scripting) that
 | [`webhook-failure-explanation`](webhook-failure-explanation) | Explains why encoding failed |
 | [`webhook-duplicate-detection`](webhook-duplicate-detection) | Catches duplicate uploads by `originalHash` |
 | [`webhook-storage-quotas`](webhook-storage-quotas) | Tracks storage per user for plan limits |
-| [`webhook-direct-upload-status`](webhook-direct-upload-status) | Tracks pre-signed browser uploads |
+| [`webhook-direct-upload-status`](webhook-direct-upload-status) | Tracks server-side upload states for pre-signed uploads |
 | [`webhook-delete-cleanup`](webhook-delete-cleanup) | Cleans up and purges the CDN when a video is deleted |
 | [`webhook-pull-quotes`](webhook-pull-quotes) | Pulls timestamped quotes from captions for social posts |
 | [`webhook-ai-feature-recovery`](webhook-ai-feature-recovery) | Alerts when captions or AI features fail |

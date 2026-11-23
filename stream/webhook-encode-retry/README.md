@@ -4,6 +4,8 @@ A [Bunny Stream webhook](https://docs.bunny.net/stream/webhooks) handler running
 
 Some failures are transient, so the first failure for a video triggers a re-encode and the second goes to Slack. Re-encoding reads the original upload, so turn on **Keep Original Files** (`bunny stream libraries update <library> --keep-original`). It also re-queues transcription when that's switched on, which is billed again.
 
+Status 5 is also sent when a URL fetch fails or a non-video file is rejected. Neither has an original, so the re-encode is refused with a `400`. The script checks the response and alerts Slack straight away when that happens, since no second failure will arrive.
+
 Handles status 5. Every other status gets a `200` and is ignored.
 
 > [!WARNING]
