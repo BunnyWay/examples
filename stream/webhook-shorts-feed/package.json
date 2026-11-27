@@ -1,0 +1,22 @@
+{
+  "name": "stream-webhook-shorts-feed",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch src/main.ts",
+    "build": "esbuild src/main.ts --bundle --format=esm --platform=browser --external:node:* --outfile=dist/main.js",
+    "deploy": "npm run build && bunny scripts deploy dist/main.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bunny.net/edgescript-sdk": "^0.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  }
+}

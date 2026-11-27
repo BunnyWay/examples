@@ -1,6 +1,6 @@
 # Bunny Stream examples
 
-Examples for playing and uploading video with [Bunny Stream](https://docs.bunny.net/stream).
+Examples for playing, uploading, and reacting to video with [Bunny Stream](https://docs.bunny.net/stream).
 
 ## Bunny Player
 
@@ -47,3 +47,30 @@ With [token authentication](https://docs.bunny.net/stream/token-authentication) 
 | [`player-token-auth-nextjs`](player-token-auth-nextjs) | Next.js App Router |
 | [`player-token-auth-nuxt`](player-token-auth-nuxt) | Nuxt 4 |
 | [`player-token-auth-sveltekit`](player-token-auth-sveltekit) | SvelteKit with Svelte 5 |
+
+## Webhooks
+
+Each folder is a standalone [Edge Script](https://docs.bunny.net/scripting) that handles [Bunny Stream webhooks](https://docs.bunny.net/stream/webhooks). They all verify the webhook signature with the library's read-only API key, then act on one or more video statuses. Live stream statuses (14 to 31) arrive on the same URL with `IsLiveStreamWebhook: true`, and these scripts ignore them. Each one deploys with `npm run deploy` after `bunny scripts create`, and its README lists the env vars it needs.
+
+| Example | What it does |
+| --- | --- |
+| [`webhook-auto-collections`](webhook-auto-collections) | Sorts videos into collections by detected category |
+| [`webhook-searchable-transcripts`](webhook-searchable-transcripts) | Turns captions into searchable transcripts |
+| [`webhook-ai-title-review`](webhook-ai-title-review) | Sends AI titles and descriptions to Slack for review |
+| [`webhook-chapters-moments`](webhook-chapters-moments) | Saves chapters and shareable moment links |
+| [`webhook-playable-notification`](webhook-playable-notification) | Tells the uploader once the first resolution is playable |
+| [`webhook-upload-rules`](webhook-upload-rules) | Deletes videos that are too long or too low resolution |
+| [`webhook-shorts-feed`](webhook-shorts-feed) | Routes short vertical clips to a shorts feed |
+| [`webhook-publish-gate`](webhook-publish-gate) | Publishes a video once every resolution is encoded |
+| [`webhook-new-video-announcement`](webhook-new-video-announcement) | Posts new videos to Slack |
+| [`webhook-thumbnail-blurhash`](webhook-thumbnail-blurhash) | Stores thumbnail blurhash placeholders |
+| [`webhook-video-seo-jsonld`](webhook-video-seo-jsonld) | Builds `VideoObject` JSON-LD for search engines |
+| [`webhook-video-sitemap`](webhook-video-sitemap) | Writes a video sitemap to Bunny Storage |
+| [`webhook-encode-retry`](webhook-encode-retry) | Re-encodes a failed video once, then alerts Slack |
+| [`webhook-failure-explanation`](webhook-failure-explanation) | Explains why encoding failed |
+| [`webhook-duplicate-detection`](webhook-duplicate-detection) | Catches duplicate uploads by `originalHash` |
+| [`webhook-storage-quotas`](webhook-storage-quotas) | Tracks storage per user for plan limits |
+| [`webhook-direct-upload-status`](webhook-direct-upload-status) | Tracks server-side upload states for pre-signed uploads |
+| [`webhook-delete-cleanup`](webhook-delete-cleanup) | Cleans up and purges the CDN when a video is deleted |
+| [`webhook-pull-quotes`](webhook-pull-quotes) | Pulls timestamped quotes from captions for social posts |
+| [`webhook-ai-feature-recovery`](webhook-ai-feature-recovery) | Alerts when captions or AI features fail |
